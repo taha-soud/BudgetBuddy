@@ -1,0 +1,9 @@
+Purpose: Provides utility functions that can be used across the application.
+Contents: Dart files containing utility functions (e.g., format_utils.dart, validator.dart).
+
+##example
+class Validator {
+  static bool isValidEmail(String email) {
+    return email.contains('@');
+  }
+}

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async'; // Required for using Timer
-import 'main.dart';
+import '../main.dart';
 class SplashScreen extends StatefulWidget {
   @override
   _SplashScreenState createState() => _SplashScreenState();

@@ -1,0 +1,17 @@
+Purpose: Contains the business logic and state management for the views.
+Contents: Dart files for your view models (e.g., user_view_model.dart).
+
+##example
+import 'package:flutter/material.dart';
+import '../models/user.dart';
+
+class UserViewModel extends ChangeNotifier {
+  User user;
+
+  UserViewModel(this.user);
+
+  void updateUser(String name) {
+    user = User(id: user.id, name: name);
+    notifyListeners();
+  }
+}
