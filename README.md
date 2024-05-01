@@ -13,12 +13,12 @@ Budget Buddy is a personal finance application designed to help users manage the
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-### Prerequisites
+## Prerequisites
 
 Ensure you have Flutter installed on your system. To verify your installation, run: 
 flutter --version
 
-#### Installing
+## Installing
 Follow these steps to get a local copy up and running:
 
 1.Clone the repo:
@@ -34,19 +34,18 @@ flutter pub get
 4.Run the application:
 flutter run
 
-##### Running the Tests
+5. Running the Tests
 To execute the automated tests for this system, use the following command:
-
 flutter test
 
-###### Authors
+## Authors
 
 Budget Buddy is brought to you by the following individuals:
 
-- Taha Abualsoud -  - (https://github.com/GitHubUsername1)
-- Izz Moqbel -  - (https://github.com/GitHubUsername2)
-- Shahed Hamamrah -  - (https://github.com/GitHubUsername3)
-- Mosab Khraim - - (https://github.com/GitHubUsername4)
+- Taha Abualsoud -  - https://github.com/taha-soud
+- Izz Moqbel -  - https://github.com/izzmoqbel
+- Shahed Hamamrah -  - https://github.com/shahdjamal119
+- Mosab Khraim - - https://github.com/Mosab01
 
 These developers have collaborated to bring this project to fruition. Feel free to reach out or follow their contributions through their GitHub profiles linked above.
 
