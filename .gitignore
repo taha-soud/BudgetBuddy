@@ -25,3 +25,24 @@ doc/api/
 
 .flutter-plugins
 .flutter-plugins-dependencies
+
+# Flutter specific
+**/ios/Flutter/.last_build_id
+**/ios/Flutter/Generated.xcconfig
+**/ios/.symlinks/
+**/ios/Flutter/flutter_export_environment.sh
+**/android/local.properties
+**/android/app/debug/
+**/android/app/profile/
+**/android/app/release/
+flutter_*.png
+
+# IDE specific for Android Studio/IntelliJ
+.idea/
+*.iml
+*.hprof
+
+# Temporary Build Files
+*.log
+*.tmp
+*.temp
