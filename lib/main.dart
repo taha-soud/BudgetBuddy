@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'views/splash_screen.dart'; // Import the splash screen widget
+import 'views/landing_page_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -13,7 +14,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      home: SplashScreen(), // Start with the SplashScreen
+      home: SplashScreen(),
+
+
+    // Start with the SplashScreen
     );
   }
 }

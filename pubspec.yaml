@@ -61,5 +61,6 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   # to add images in assets
-  #assets:
+  assets:
+  - assets/images/betting.png
 
