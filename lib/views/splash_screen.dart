@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'dart:async'; // Required for using Timer
 import '../main.dart';
 class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
   @override
+
   _SplashScreenState createState() => _SplashScreenState();
 }
 
@@ -18,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      backgroundColor: Colors.teal,
+      backgroundColor: Color(0xFF00838F),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
