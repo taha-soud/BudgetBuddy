@@ -63,4 +63,6 @@ flutter:
   # to add images in assets
   assets:
   - assets/images/betting.png
+  - assets/images/wallet.png
+  - assets/images/check.png
 
