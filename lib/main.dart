@@ -1,4 +1,10 @@
 
+import 'package:budget_buddy/views/budget_screen.dart';
+import 'package:budget_buddy/views/home_screen.dart';
+import 'package:budget_buddy/views/nav_bar.dart';
+import 'package:budget_buddy/views/my_account_settings_screen.dart';
+import 'package:budget_buddy/views/sign_in_screen.dart';
+import 'package:budget_buddy/views/transaction_screen.dart';
 import 'package:flutter/material.dart';
 import 'views/splash_screen.dart'; // Import the splash screen widget
 void main() {
@@ -14,7 +20,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.teal,
       ),
-      home: const SplashScreen(), // Start with the SplashScreen
+      home:  const SplashScreen() // Start with the SplashScreen
     );
   }
 }
