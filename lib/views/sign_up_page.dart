@@ -10,7 +10,7 @@ class SignUpPage extends StatefulWidget {
   _SignUpPageState createState() => _SignUpPageState();
 }
 
-//i cant make widget file and but the SignUpForm inside it and here just ask the class i will ask about it
+//i can make widget file and put the SignUpForm inside it and here just ask the class. i will ask about it
 
 class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _fullNameController = TextEditingController();
@@ -134,7 +134,13 @@ class _SignUpPageState extends State<SignUpPage> {
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           // Add logic for email/password signup
+                          widget.viewModel.signUpWithEmail(
+                            fullname: _fullNameController.text.trim(),
+                            email: _emailController.text.trim(),
+                            password: _passwordController.text.trim()
+                          );
                         }
+
                       },
                       style: ButtonStyle(
                         minimumSize: MaterialStateProperty.all<Size>(const Size(201, 51)),
