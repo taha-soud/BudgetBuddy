@@ -122,7 +122,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   children: [
                     TextButton(
                       onPressed: () {
-                        // Add logic to navigate to another page
+                        //widget.viewModel.navigateToLoginPage();
                       },
                       child: const Text(
                         'Already have an account?',
@@ -132,15 +132,14 @@ class _SignUpPageState extends State<SignUpPage> {
                     const SizedBox(height: 20.0),
                     ElevatedButton(
                       onPressed: () {
+
                         if (_formKey.currentState!.validate()) {
-                          // Add logic for email/password signup
                           widget.viewModel.signUpWithEmail(
-                            fullname: _fullNameController.text.trim(),
-                            email: _emailController.text.trim(),
-                            password: _passwordController.text.trim()
+                              fullname: _fullNameController.text.trim(),
+                              email: _emailController.text.trim(),
+                              password: _passwordController.text.trim()
                           );
                         }
-
                       },
                       style: ButtonStyle(
                         minimumSize: MaterialStateProperty.all<Size>(const Size(201, 51)),
