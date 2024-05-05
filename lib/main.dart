@@ -2,7 +2,7 @@
 import 'package:budget_buddy/views/budget_screen.dart';
 import 'package:budget_buddy/views/home_screen.dart';
 import 'package:budget_buddy/views/nav_bar.dart';
-import 'package:budget_buddy/views/my_account_settings_screen.dart';
+import 'package:budget_buddy/views/profile_screen.dart';
 import 'package:budget_buddy/views/sign_in_screen.dart';
 import 'package:budget_buddy/views/transaction_screen.dart';
 import 'package:flutter/material.dart';

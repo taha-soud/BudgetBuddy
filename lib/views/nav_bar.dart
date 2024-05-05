@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'home_screen.dart';  // Make sure these imports are correctly pointing to your screen files
 import 'transaction_screen.dart';
 import 'budget_screen.dart';
-import 'my_account_settings_screen.dart';
+import 'profile_screen.dart';
 
 class NavBar extends StatelessWidget {
   final int currentIndex;
@@ -57,7 +57,7 @@ class NavBar extends StatelessWidget {
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const BudgetScreen()));
               break;
             case 3:
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MyAccountSettingsScreen()));
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const ProfileScreen()));
               break;
           }
         },
