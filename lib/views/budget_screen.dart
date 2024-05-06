@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'nav_bar.dart'; // Ensure this import points to where your PersistentNavBarScreen is defined
+import 'bottom_bar.dart'; // Ensure this import points to where your PersistentNavBarScreen is defined
 
 class BudgetScreen extends StatelessWidget {
   const BudgetScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return NavBar(
+    return BottomBar(
       currentIndex: 2,  // Set the current index for the Budget screen
       child: Scaffold(
         backgroundColor: const Color(0xFF00838F),

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'nav_bar.dart';
+import 'bottom_bar.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return NavBar(
+    return BottomBar(
       currentIndex: 0,
       child: Scaffold(
         backgroundColor: Color(0xFF00838F),

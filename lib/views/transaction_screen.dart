@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'nav_bar.dart';
+import 'bottom_bar.dart';
 class TransactionScreen extends StatelessWidget {
   const TransactionScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return NavBar(
+    return BottomBar(
       currentIndex: 1,  // Set the current index for the Transaction screen
       child: Scaffold(
         backgroundColor: const Color(0xFF00838F),
