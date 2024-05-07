@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../view_models/sign_up_view_model.dart';
 
@@ -5,7 +6,7 @@ import '../view_models/sign_up_view_model.dart';
 class SignUpPage extends StatefulWidget {
   final SignUpViewModel viewModel = SignUpViewModel();
   SignUpViewModel signUpViewModel = SignUpViewModel();
-  SignUpPage({Key? key}) : super(key: key);
+  SignUpPage({super.key});
 
 
   @override
@@ -23,12 +24,6 @@ class _SignUpPageState extends State<SignUpPage> {
 
   SignUpViewModel? viewModel;
   get signUpViewModel => null;
-
-  @override
-  void initState() {
-    super.initState();
-    viewModel = SignUpViewModel();  // Ensuring the ViewModel is initialized
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,13 +45,32 @@ class _SignUpPageState extends State<SignUpPage> {
                 ElevatedButton.icon(
                   icon: Image.asset('assets/icons/google.png', height: 24.0),
                   label: const Text("Sign in with Google"),
-                  onPressed: () {
-                    widget.signUpViewModel.signInWithGoogle().catchError((error) {
+                  onPressed: () async {
+                    try {
+                      await widget.signUpViewModel.signUpWithGoogle();
+                    } on FirebaseAuthException catch (e) {
+                      String errorMessage = 'Failed to sign in with Google';
+                      if (e.code == 'account-exists-with-different-credential') {
+                        errorMessage = 'The account already exists with a different credential.';
+                      } else if (e.code == 'invalid-credential') {
+                        errorMessage = 'Invalid credentials, please try again.';
+                      }
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text(errorMessage),
+                        duration: Duration(seconds: 5),
+                      ));
+                    } catch (error) {
                       print("Failed to sign in with Google: $error");
-                    });
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text('Failed to sign in with Google'),
+                        duration: Duration(seconds: 5),
+                      ));
+                    }
                   },
 
                 ),
+
+
                 const SizedBox(height: 20.0),
                 const Row(
                   children: [
