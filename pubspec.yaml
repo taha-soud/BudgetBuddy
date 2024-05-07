@@ -67,5 +67,8 @@ flutter:
 
   # to add images in assets
   assets:
-    - "assets/icons/google-icon.png"
+  - "assets/icons/google-icon.png"
+  - assets/images/betting.png
+  - assets/images/wallet.png
+  - assets/images/check.png
 

@@ -2,6 +2,7 @@ import 'package:budget_buddy/views/login_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'views/splash_screen.dart'; // Import the splash screen widget
+import 'views/landing_page_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -15,7 +16,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      home: SplashScreen(), // Start with the SplashScreen
+      home: SplashScreen(),
+
+
+    // Start with the SplashScreen
     );
   }
 }

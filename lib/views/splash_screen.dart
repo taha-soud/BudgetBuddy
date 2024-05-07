@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async'; // Required for using Timer
 import '../main.dart';
+import 'landing_page_screen.dart';
 class SplashScreen extends StatefulWidget {
   @override
   _SplashScreenState createState() => _SplashScreenState();
@@ -11,7 +12,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Timer(const Duration(seconds: 2), () {
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => MyHomePage(title: 'Home Page')));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LandingPage()));
     });
   }
 
