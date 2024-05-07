@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import "package:firebase_auth/firebase_auth.dart";
-
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 
 
@@ -9,10 +12,31 @@ import "package:firebase_auth/firebase_auth.dart";
 
 class SignUpViewModel {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn googleSignIn = GoogleSignIn();
 
-  void signUpWithGoogle() {
-    //logic for signup with google
+
+  Future<void> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleSignInAccount = await googleSignIn
+          .signIn();
+      final GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount!
+          .authentication;
+
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleSignInAuthentication.accessToken,
+        idToken: googleSignInAuthentication.idToken,
+      );
+
+      final UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithCredential(credential);
+      final User? user = userCredential.user;
+
+      // Use the user object for further operations or navigate to a new screen.
+    } catch (e) {
+      print(e.toString());
+    }
   }
+
 
   Future <void> signUpWithEmail({
     required String fullname,
@@ -51,7 +75,7 @@ class SignUpViewModel {
           .doc(uid).
           set(newUser.toMap());
       */
-     // Navigator.pushReplacementNamed(context, '/createBudget');
+      // Navigator.pushReplacementNamed(context, '/createBudget');
     }
     catch (e) {
       //when make the tird partis i will handel the error here
@@ -59,10 +83,9 @@ class SignUpViewModel {
     }
   }
 
-}
-
 
   void navigateToLoginPage() {
     // Navigator.pushReplacementNamed(context, '/login');
 
   }
+}

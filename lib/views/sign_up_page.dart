@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import '../view_models/sign_up_view_model.dart';
 
+
 class SignUpPage extends StatefulWidget {
   final SignUpViewModel viewModel = SignUpViewModel();
+  SignUpViewModel signUpViewModel = SignUpViewModel();
+  SignUpPage({Key? key}) : super(key: key);
 
-  SignUpPage({super.key});
 
   @override
   _SignUpPageState createState() => _SignUpPageState();
@@ -18,6 +20,15 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  SignUpViewModel? viewModel;
+  get signUpViewModel => null;
+
+  @override
+  void initState() {
+    super.initState();
+    viewModel = SignUpViewModel();  // Ensuring the ViewModel is initialized
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,11 +48,14 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 const SizedBox(height: 20.0),
                 ElevatedButton.icon(
+                  icon: Image.asset('assets/icons/google.png', height: 24.0),
+                  label: const Text("Sign in with Google"),
                   onPressed: () {
-                    // Add logic for Google signup
+                    widget.signUpViewModel.signInWithGoogle().catchError((error) {
+                      print("Failed to sign in with Google: $error");
+                    });
                   },
-                  icon: const Icon(Icons.smart_button),
-                  label: const Text('Sign up with Google'),
+
                 ),
                 const SizedBox(height: 20.0),
                 const Row(

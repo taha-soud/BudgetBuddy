@@ -1,3 +1,4 @@
+import 'package:budget_buddy/views/sign_up_page.dart';
 import 'package:flutter/material.dart';
 import 'dart:async'; // Required for using Timer
 import '../main.dart';
@@ -11,7 +12,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Timer(const Duration(seconds: 2), () {
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => MyHomePage(title: 'Home Page')));
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => SignUpPage()));
     });
   }
 
