@@ -59,10 +59,7 @@ class SignUpViewModel {
         id:uid,
         username:fullname,
         email:email,
-        password:'',
-        budgetId:'',
-        signUpDate: DateTime.timestamp(),
-
+        budgetId: null,
       );
 
       await FirebaseFirestore.instance

@@ -43,7 +43,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 const SizedBox(height: 20.0),
                 ElevatedButton.icon(
-                  icon: Image.asset('assets/icons/google.png', height: 24.0),
+                  icon: const Icon(Icons.email),
                   label: const Text("Sign in with Google"),
                   onPressed: () async {
                     try {
@@ -57,11 +57,11 @@ class _SignUpPageState extends State<SignUpPage> {
                       }
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text(errorMessage),
-                        duration: Duration(seconds: 5),
+                        duration: const Duration(seconds: 5),
                       ));
                     } catch (error) {
                       print("Failed to sign in with Google: $error");
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                         content: Text('Failed to sign in with Google'),
                         duration: Duration(seconds: 5),
                       ));
@@ -159,13 +159,37 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     const SizedBox(height: 20.0),
                     ElevatedButton(
-                      onPressed: () {
-
-                        if (_formKey.currentState!.validate()) {
-                          widget.viewModel.signUpWithEmail(
+                      onPressed: () async {
+                        try {
+                          if (_formKey.currentState!.validate()) {
+                            await widget.signUpViewModel.signUpWithEmail(
                               fullname: _fullNameController.text.trim(),
                               email: _emailController.text.trim(),
-                              password: _passwordController.text.trim()
+                              password: _passwordController.text.trim(),
+                            );
+                          }
+                        } on FirebaseAuthException catch (e) {
+                          String errorMessage = 'Failed to sign up';
+                          if (e.code == 'email-already-in-use') {
+                            errorMessage = 'The email address is already in use by another account.';
+                          } else if (e.code == 'invalid-email') {
+                            errorMessage = 'The email address is invalid.';
+                          } else if (e.code == 'weak-password') {
+                            errorMessage = 'The password is too weak.';
+                          }
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(errorMessage),
+                              duration: const Duration(seconds: 5),
+                            ),
+                          );
+                        } catch (error) {
+                          print("Failed to sign up: $error");
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Failed to sign up'),
+                              duration: Duration(seconds: 5),
+                            ),
                           );
                         }
                       },
