@@ -1,7 +1,13 @@
+
+import 'package:budget_buddy/views/budget_screen.dart';
+import 'package:budget_buddy/views/home_screen.dart';
+import 'package:budget_buddy/views/bottom_bar.dart';
+import 'package:budget_buddy/views/profile_screen.dart';
+import 'package:budget_buddy/views/transaction_screen.dart';
 import 'package:flutter/material.dart';
 import 'views/splash_screen.dart'; // Import the splash screen widget
-
 void main() {
+
   runApp(MyApp());
 }
 
@@ -11,9 +17,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Budget Buddy',
       theme: ThemeData(
-        primarySwatch: Colors.green,
+        primarySwatch: Colors.teal,
       ),
-      home: SplashScreen(), // Start with the SplashScreen
+      home:  const SplashScreen() // Start with the SplashScreen
     );
   }
 }
