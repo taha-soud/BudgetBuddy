@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../res/custom_color.dart';
 import '../view_models/bottom_bar_viewmodel.dart';
 
 class BottomBar extends StatelessWidget {
@@ -13,31 +14,31 @@ class BottomBar extends StatelessWidget {
     return Scaffold(
       body: child,
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: currentIndex, // Active item index
-        backgroundColor: const Color(0xFF00838F), // Teal background
-        selectedItemColor: Colors.grey, // Grey color for the selected item icon and text
-        unselectedItemColor: Colors.white, // White color for unselected items
-        type: BottomNavigationBarType.fixed, // Fixed type for consistent positioning
+        currentIndex: currentIndex,
+        backgroundColor: AppColors.primary,
+        selectedItemColor: Colors.grey,
+        unselectedItemColor: Colors.white,
+        type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
-            backgroundColor: Color(0xFF00838F),
+            backgroundColor: AppColors.primary,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.swap_horiz),
             label: 'Transaction',
-            backgroundColor: Color(0xFF00838F),
+            backgroundColor: AppColors.primary,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.pie_chart),
             label: 'Budget',
-            backgroundColor: Color(0xFF00838F),
+            backgroundColor: AppColors.primary,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Profile',
-            backgroundColor: Color(0xFF00838F),
+            backgroundColor: AppColors.primary,
           ),
         ],
         onTap: (index) {

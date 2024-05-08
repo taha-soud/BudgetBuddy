@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../res/custom_color.dart';
 import 'bottom_bar.dart';
 class TransactionScreen extends StatelessWidget {
   const TransactionScreen({super.key});
@@ -6,16 +7,16 @@ class TransactionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomBar(
-      currentIndex: 1,  // Set the current index for the Transaction screen
+      currentIndex: 1,
       child: Scaffold(
-        backgroundColor: const Color(0xFF00838F),
+        backgroundColor: AppColors.primary,
         appBar: AppBar(
           title: const Text('Transactions', style: TextStyle(color: Colors.white)),
           centerTitle: true,
-          backgroundColor: const Color(0xFF00838F),
+          backgroundColor: AppColors.primary,
         ),
         body: Container(
-          color: const Color(0xFF00838F),
+          color: AppColors.primary,
         ),
       ),
     );

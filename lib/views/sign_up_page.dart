@@ -1,19 +1,21 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:budget_buddy/views/budget_screen.dart';
+import 'package:budget_buddy/views/home_screen.dart';
 import 'package:flutter/material.dart';
+import '../res/custom_color.dart';
+import '../utils/valedation.dart';
 import '../view_models/sign_up_view_model.dart';
-
+import 'lets_set_wallet_screen.dart';
+import 'login_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SignUpPage extends StatefulWidget {
   final SignUpViewModel viewModel = SignUpViewModel();
   SignUpViewModel signUpViewModel = SignUpViewModel();
-  SignUpPage({super.key});
-
+  SignUpPage({Key? key});
 
   @override
   _SignUpPageState createState() => _SignUpPageState();
 }
-
-//i can make widget file and put the SignUpForm inside it and here just ask the class. i will ask about it
 
 class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _fullNameController = TextEditingController();
@@ -21,17 +23,22 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
   SignUpViewModel? viewModel;
   get signUpViewModel => null;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF00838F),
+      backgroundColor: AppColors.primary,
+      appBar: AppBar(
+        title: const Text("BudgetBuddy", style: TextStyle(color: Colors.white)),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20.0, 200.0, 16.0, 16.0),
+          padding: const EdgeInsets.fromLTRB(20,100,16,16),
           child: Form(
             key: _formKey,
             child: Column(
@@ -43,11 +50,13 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 const SizedBox(height: 20.0),
                 ElevatedButton.icon(
-                  icon: const Icon(Icons.email),
-                  label: const Text("Sign in with Google"),
+                  icon: Image.asset("assets/icons/google-icon.png",height: 24,width: 24,),
+                  label: const Text("Continue with Google"),
                   onPressed: () async {
                     try {
                       await widget.signUpViewModel.signUpWithGoogle();
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => WalletSetupPage()));
+
                     } on FirebaseAuthException catch (e) {
                       String errorMessage = 'Failed to sign in with Google';
                       if (e.code == 'account-exists-with-different-credential') {
@@ -67,10 +76,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       ));
                     }
                   },
-
                 ),
-
-
                 const SizedBox(height: 20.0),
                 const Row(
                   children: [
@@ -99,7 +105,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     fillColor: Colors.white,
                   ),
                   onChanged: (_) => _formKey.currentState!.validate(),
-                  //validator: Validator.validateFullName,
+                  validator: Validator.validateFullName,
                 ),
                 const SizedBox(height: 10.0),
                 TextFormField(
@@ -113,7 +119,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     fillColor: Colors.white,
                   ),
                   onChanged: (_) => _formKey.currentState!.validate(),
-                //  validator: Validator.validateEmail,
+                  validator: Validator.validateEmail,
                 ),
                 const SizedBox(height: 10.0),
                 TextFormField(
@@ -128,7 +134,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                   obscureText: true,
                   onChanged: (_) => _formKey.currentState!.validate(),
-                 // validator: Validator.validatePassword,
+                  validator: Validator.validatePassword,
                 ),
                 const SizedBox(height: 10.0),
                 TextFormField(
@@ -143,18 +149,18 @@ class _SignUpPageState extends State<SignUpPage> {
                     fillColor: Colors.white,
                   ),
                   onChanged: (_) => _formKey.currentState!.validate(),
-                 // validator: (value) => Validator.validateConfirmPassword(value, _passwordController.text),
+                  validator: (value) => Validator.validateConfirmPassword(value, _passwordController.text),
                 ),
                 const SizedBox(height: 10.0),
                 Column(
                   children: [
                     TextButton(
                       onPressed: () {
-                        //widget.viewModel.navigateToLoginPage();
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SignInScreen()));
                       },
                       child: const Text(
                         'Already have an account?',
-                        style: TextStyle(color: Colors.indigo),
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
                     const SizedBox(height: 20.0),
@@ -167,6 +173,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               email: _emailController.text.trim(),
                               password: _passwordController.text.trim(),
                             );
+                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  WalletSetupPage()));
                           }
                         } on FirebaseAuthException catch (e) {
                           String errorMessage = 'Failed to sign up';
@@ -184,7 +191,6 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                           );
                         } catch (error) {
-                          print("Failed to sign up: $error");
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('Failed to sign up'),
@@ -195,7 +201,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       },
                       style: ButtonStyle(
                         minimumSize: MaterialStateProperty.all<Size>(const Size(201, 51)),
-                        backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF09719D).withOpacity(0.57)),
+                        backgroundColor: MaterialStateProperty.all<Color>(AppColors.tertiary),
                       ),
                       child: const Text(
                         'Sign up',

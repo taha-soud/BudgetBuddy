@@ -1,8 +1,15 @@
+import 'package:budget_buddy/views/home_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../res/custom_color.dart';
 import '../view_models/login_viewmodel.dart';
 
 class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+  final SignInViewModel viewModel = SignInViewModel();
+  SignInViewModel signUpViewModel = SignInViewModel();
+
+
+  SignInScreen({super.key});
 
   @override
   _SignInScreenState createState() => _SignInScreenState();
@@ -11,16 +18,14 @@ class SignInScreen extends StatefulWidget {
 class _SignInScreenState extends State<SignInScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final SignInViewModel viewModel = SignInViewModel(); // Create an instance of the ViewModel
+  final SignInViewModel viewModel = SignInViewModel();
   bool _passwordVisible = false;
 
   @override
   Widget build(BuildContext context) {
-    final Color mainColor = const Color(0xFF00838F);
-    final Color buttonColor = const Color(0xFF00838F).withOpacity(0.55);
 
     return Scaffold(
-      backgroundColor: mainColor,
+      backgroundColor: AppColors.primary,
       appBar: AppBar(
         title: const Text("BudgetBuddy", style: TextStyle(color: Colors.white)),
         centerTitle: true,
@@ -32,12 +37,17 @@ class _SignInScreenState extends State<SignInScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text('Sign in to your account', style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold)),
+            const Text(
+              'Sign in for BudgetBuddy',
+              style: TextStyle(fontSize: 24.0, color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
+
             const SizedBox(height: 20),
             TextField(
               controller: emailController,
               decoration: InputDecoration(
-                labelText: 'Email',
+                hintText: 'Email',
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(
@@ -51,7 +61,7 @@ class _SignInScreenState extends State<SignInScreen> {
               controller: passwordController,
               obscureText: !_passwordVisible,
               decoration: InputDecoration(
-                labelText: 'Password',
+                hintText: 'Password',
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(
@@ -79,7 +89,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     onPressed: () => viewModel.signInWithEmail(emailController.text, passwordController.text, context),
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: buttonColor,
+                      backgroundColor: AppColors.tertiary,
                       minimumSize: const Size(double.infinity, 50),
                     ),
                     child: const Text('Sign in'),
@@ -90,10 +100,35 @@ class _SignInScreenState extends State<SignInScreen> {
                   child: ElevatedButton.icon(
                     icon: Image.asset('assets/icons/google-icon.png', height: 24, width: 24),
                     label: const Text('Google'),
-                    onPressed: () {}, // Placeholder for Google sign-in logic
+                    onPressed: () async {
+                      try {
+                        await widget.signUpViewModel.signInWithGoogle();
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>const HomeScreen()));
+
+                      } on FirebaseAuthException catch (e) {
+                        String errorMessage = 'Failed to sign in with Google';
+                        if (e.code == 'account-exists-with-different-credential') {
+                          errorMessage =
+                          'The account already exists with a different credential.';
+                        } else if (e.code == 'invalid-credential') {
+                          errorMessage = 'Invalid credentials, please try again.';
+                        }
+
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(errorMessage),
+                          duration: const Duration(seconds: 5),
+                        ));
+                      } catch (error) {
+                        print("Failed to sign in with Google: $error");
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text('Failed to sign in with Google'),
+                          duration: Duration(seconds: 5),
+                        ));
+                      }
+                    },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: buttonColor,
+                      backgroundColor: AppColors.tertiary,
                       minimumSize: const Size(double.infinity, 50),
                     ),
                   ),
@@ -102,7 +137,7 @@ class _SignInScreenState extends State<SignInScreen> {
             ),
             const SizedBox(height: 20),
             TextButton(
-              onPressed: () {},
+              onPressed: () => viewModel.navigateToForgotPassword(context),
               style: TextButton.styleFrom(
                 foregroundColor: Colors.white,
               ),
@@ -110,7 +145,7 @@ class _SignInScreenState extends State<SignInScreen> {
             ),
             const SizedBox(height: 20),
             GestureDetector(
-              onTap: (){}, // => viewModel.navigateToSignUp(context)
+              onTap: () => viewModel.navigateToSignUp(context),
               child: const Text('Don’t have an account? Signup here', style: TextStyle(color: Colors.white, decoration: TextDecoration.underline)),
             ),
           ],

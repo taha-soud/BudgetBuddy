@@ -1,3 +1,4 @@
+import 'package:budget_buddy/views/login_screen.dart';
 import 'package:flutter/material.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
@@ -10,7 +11,7 @@ class ForgotPasswordScreen extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white), // Customize the back arrow color
-          onPressed: () => Navigator.of(context).pop(), // Pop current screen off the navigation stack
+          onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>SignInScreen())) // Pop current screen off the navigation stack
         ),
         title: const Text("BudgetBuddy", style: TextStyle(color: Colors.white)), // Customize the title
         centerTitle: true,  // Center the title

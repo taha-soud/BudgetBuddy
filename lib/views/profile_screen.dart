@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../res/custom_color.dart';
 import 'bottom_bar.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -7,14 +8,14 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomBar(
-      currentIndex: 3,  // Set the current index for the Profile screen
+      currentIndex: 3,
       child: Scaffold(
-        backgroundColor: const Color(0xFF00838F),
+        backgroundColor: AppColors.primary,
         appBar: AppBar(
-          backgroundColor: const Color(0xFF00838F),
+          backgroundColor: AppColors.primary,
         ),
         body: Container(
-          color: const Color(0xFF00838F),
+          color: AppColors.primary,
         ),
       ),
     );

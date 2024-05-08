@@ -1,3 +1,4 @@
+import 'package:budget_buddy/res/custom_color.dart';
 import 'package:budget_buddy/views/sign_up_page.dart';
 import 'package:flutter/material.dart';
 import 'dart:async'; // Required for using Timer
@@ -16,7 +17,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Timer(const Duration(seconds: 2), () {
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => SignUpPage()));
+      // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => SignUpPage()));
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LandingPage()));
 
     });
@@ -25,12 +26,12 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      backgroundColor: Color(0xFF00838F),
+      backgroundColor: AppColors.primary,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Icon(Icons.account_balance_wallet, size: 100, color: Colors.white), // An example icon
+            Icon(Icons.account_balance_wallet, size: 100, color: Colors.white),
             Text('Welcome to Budget Buddy',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
             Padding(
