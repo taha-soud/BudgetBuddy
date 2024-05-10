@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../view_models/login_viewmodel.dart';
+import '/views/forgot_password_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -11,7 +12,8 @@ class SignInScreen extends StatefulWidget {
 class _SignInScreenState extends State<SignInScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final SignInViewModel viewModel = SignInViewModel(); // Create an instance of the ViewModel
+  final SignInViewModel viewModel =
+      SignInViewModel(); // Create an instance of the ViewModel
   bool _passwordVisible = false;
 
   @override
@@ -32,7 +34,11 @@ class _SignInScreenState extends State<SignInScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text('Sign in to your account', style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold)),
+            const Text('Sign in to your account',
+                style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold)),
             const SizedBox(height: 20),
             TextField(
               controller: emailController,
@@ -76,7 +82,8 @@ class _SignInScreenState extends State<SignInScreen> {
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () => viewModel.signInWithEmail(emailController.text, passwordController.text, context),
+                    onPressed: () => viewModel.signInWithEmail(
+                        emailController.text, passwordController.text, context),
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
                       backgroundColor: buttonColor,
@@ -88,7 +95,8 @@ class _SignInScreenState extends State<SignInScreen> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: ElevatedButton.icon(
-                    icon: Image.asset('assets/icons/google-icon.png', height: 24, width: 24),
+                    icon: Image.asset('assets/icons/google-icon.png',
+                        height: 24, width: 24),
                     label: const Text('Google'),
                     onPressed: () {}, // Placeholder for Google sign-in logic
                     style: ElevatedButton.styleFrom(
@@ -102,7 +110,13 @@ class _SignInScreenState extends State<SignInScreen> {
             ),
             const SizedBox(height: 20),
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ForgotPasswordScreen()),
+                );
+              },
               style: TextButton.styleFrom(
                 foregroundColor: Colors.white,
               ),
@@ -110,8 +124,11 @@ class _SignInScreenState extends State<SignInScreen> {
             ),
             const SizedBox(height: 20),
             GestureDetector(
-              onTap: (){}, // => viewModel.navigateToSignUp(context)
-              child: const Text('Don’t have an account? Signup here', style: TextStyle(color: Colors.white, decoration: TextDecoration.underline)),
+              onTap: () {}, // => viewModel.navigateToSignUp(context)
+              child: const Text('Don’t have an account? Signup here',
+                  style: TextStyle(
+                      color: Colors.white,
+                      decoration: TextDecoration.underline)),
             ),
           ],
         ),
