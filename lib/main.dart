@@ -2,9 +2,11 @@ import 'package:budget_buddy/utils/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'views/splash_screen.dart'; // Import the splash screen widget
-void main() {
+import 'views/budget_screen.dart';
+
+Future <void> main()async {
 WidgetsFlutterBinding.ensureInitialized();
-Firebase.initializeApp();
+await Firebase.initializeApp();
 options: DefaultFirebaseOptions.currentPlatform;
 
   runApp(MyApp());
@@ -21,7 +23,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.teal,
       ),
     // Start with the SplashScreen
-      home:  const SplashScreen() // Start with the SplashScreen
+      home:  const BudgetScreen() // Start with the SplashScreen
     );
   }
 }
