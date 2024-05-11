@@ -2,14 +2,19 @@ import 'package:budget_buddy/res/custom_color.dart';
 import 'package:budget_buddy/views/login_screen.dart';
 import 'package:flutter/material.dart';
 
-class ForgotPasswordScreen extends StatelessWidget {
+class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
 
+  @override
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+}
+
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor:
-          const Color(0xFF00838F), // Set the background color of the page
+          AppColors.primary, // Set the background color of the page
       appBar: AppBar(
         leading: IconButton(
             icon: const Icon(Icons.arrow_back,
@@ -21,7 +26,8 @@ class ForgotPasswordScreen extends StatelessWidget {
                         SignInScreen())) // Pop current screen off the navigation stack
             ),
         title: const Text("BudgetBuddy",
-            style: TextStyle(color: Colors.white)), // Customize the title
+            style:
+                TextStyle(color: AppColors.secondary)), // Customize the title
         centerTitle: true, // Center the title
         backgroundColor:
             Colors.transparent, // Make the AppBar background transparent
@@ -32,27 +38,27 @@ class ForgotPasswordScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(height: 80),
+            const SizedBox(height: 80),
             Container(
               alignment: Alignment.center,
-              child: Text(
+              child: const Text(
                 'Forgot Password?',
                 style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white),
+                    color: AppColors.secondary),
               ),
             ),
-            SizedBox(height: 60),
+            const SizedBox(height: 60),
             Container(
               alignment: Alignment.center,
-              child: Text(
+              child: const Text(
                 'Enter your email address below. We\'ll send you a link to reset your password.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 18, color: Colors.white),
+                style: TextStyle(fontSize: 18, color: AppColors.secondary),
               ),
             ),
-            SizedBox(height: 80),
+            const SizedBox(height: 80),
             Container(
               alignment: Alignment.center,
               child: Container(
@@ -62,10 +68,10 @@ class ForgotPasswordScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius:
                       BorderRadius.circular(30), // Set border radius to 30
-                  color: Colors.white,
+                  color: AppColors.secondary,
                 ),
 
-                child: TextField(
+                child: const TextField(
                   decoration: InputDecoration(
                     hintText: 'Email',
                     border: InputBorder.none,
@@ -74,7 +80,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 50,
             ),
             Container(
@@ -91,7 +97,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                 ),
                 child: const Text(
                   'Reset',
-                  style: TextStyle(color: Colors.white, fontSize: 22),
+                  style: TextStyle(color: AppColors.secondary, fontSize: 22),
                 ),
               ),
             ),
