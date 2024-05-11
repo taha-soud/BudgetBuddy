@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'bottom_bar.dart'; // Ensure this import points to where your PersistentNavBarScreen is defined
+import '../res/custom_color.dart';
+import 'bottom_bar.dart';
 
 class BudgetScreen extends StatelessWidget {
   const BudgetScreen({super.key});
@@ -7,13 +8,13 @@ class BudgetScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomBar(
-      currentIndex: 2,  // Set the current index for the Budget screen
+      currentIndex: 2,
       child: Scaffold(
-        backgroundColor: const Color(0xFF00838F),
+        backgroundColor: AppColors.primary,
         appBar: AppBar(
           title: const Text('Budget', style: TextStyle(color: Colors.white)),
           centerTitle: true,
-          backgroundColor: const Color(0xFF00838F),
+          backgroundColor: AppColors.primary,
         ),
 
       ),

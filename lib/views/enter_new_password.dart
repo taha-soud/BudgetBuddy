@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 
+import '../res/custom_color.dart';
+
 class EnterNewPassword extends StatelessWidget {
   const EnterNewPassword({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF00838F),  // Set the background color of the page
+      backgroundColor: AppColors.primary,
       appBar: AppBar(
 
-        title: const Text("BudgetBuddy", style: TextStyle(color: Colors.white)), // Customize the title
-        centerTitle: true,  // Center the title
-        backgroundColor: Colors.transparent, // Make the AppBar background transparent
-        elevation: 0, // Remove shadow from the AppBar
+        title: const Text("BudgetBuddy", style: TextStyle(color: Colors.white)),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
 
     );

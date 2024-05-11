@@ -10,6 +10,7 @@ class Validator{
   static String? validateEmail(String? email){
     if (email == null || email.isEmpty) {
       return 'Please enter your full name';
+
     }
 
     final RegExp emailRegex =
@@ -49,7 +50,6 @@ class Validator{
     }
     return null;
   }
-
 
 //Add any new validation here
 }

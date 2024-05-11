@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../res/custom_color.dart';
 import 'bottom_bar.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -8,9 +9,9 @@ class HomeScreen extends StatelessWidget {
     return BottomBar(
       currentIndex: 0,
       child: Scaffold(
-        backgroundColor: Color(0xFF00838F),
+        backgroundColor: AppColors.primary,
         appBar: AppBar(
-          backgroundColor: Color(0xFF00838F),
+          backgroundColor: AppColors.primary,
           title: const Text('BudgetBuddy', style: TextStyle(color: Colors.white)),
           centerTitle: true,
           actions: <Widget>[
@@ -23,7 +24,7 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
         body: Container(
-          color: const Color(0xFF00838F), // Keeping the background consistent
+          color: AppColors.primary,
         ),
       ),
     );
