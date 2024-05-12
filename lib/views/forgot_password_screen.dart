@@ -1,37 +1,45 @@
 import 'package:budget_buddy/res/custom_color.dart';
+import 'package:budget_buddy/utils/valedation.dart';
+import 'package:budget_buddy/view_models/forgot_password_viewmodel.dart';
 import 'package:budget_buddy/views/login_screen.dart';
 import 'package:flutter/material.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
-  const ForgotPasswordScreen({super.key});
+  ForgotPasswordScreen({super.key});
+  final ForgotPasswordViewModel forgotPasswordViewModel = ForgotPasswordViewModel();
 
   @override
   State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+    final TextEditingController _emailController = TextEditingController();
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor:
-          AppColors.primary, // Set the background color of the page
+          AppColors.primary,
       appBar: AppBar(
         leading: IconButton(
             icon: const Icon(Icons.arrow_back,
-                color: Colors.white), // Customize the back arrow color
-            onPressed: () => Navigator.pushReplacement(
+                color: Colors.white),
+            onPressed: ()  => Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
-                        SignInScreen())) // Pop current screen off the navigation stack
+                        SignInScreen()))
             ),
         title: const Text("BudgetBuddy",
             style:
-                TextStyle(color: AppColors.secondary)), // Customize the title
-        centerTitle: true, // Center the title
+                TextStyle(color: AppColors.secondary)),
+        centerTitle: true,
         backgroundColor:
-            Colors.transparent, // Make the AppBar background transparent
-        elevation: 0, // Remove shadow from the AppBar
+            Colors.transparent,
+        elevation: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -63,22 +71,26 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               alignment: Alignment.center,
               child: Container(
                 alignment: Alignment.center,
-                height: 70, // Set the height of the TextField
-                width: 320, // Set the width of the TextField
+                height: 70,
+                width: 320,
                 decoration: BoxDecoration(
                   borderRadius:
-                      BorderRadius.circular(30), // Set border radius to 30
+                      BorderRadius.circular(30),
                   color: AppColors.secondary,
                 ),
 
-                child: const TextField(
-                  decoration: InputDecoration(
+                child:  TextFormField(
+                  controller: _emailController,
+
+                  decoration: const InputDecoration(
                     hintText: 'Email',
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.symmetric(horizontal: 16),
                   ),
                 ),
+
               ),
+
             ),
             const SizedBox(
               height: 50,
@@ -86,8 +98,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             Container(
               alignment: Alignment.center,
               child: ElevatedButton(
-                onPressed: () {
-                  // Add your password reset logic here
+                onPressed: () async {
+                if(await widget.forgotPasswordViewModel.checkEmail(_emailController.text.trim())){
+
+                  await widget.forgotPasswordViewModel.sendPasswordResetEmail(_emailController.text,context);
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  SignInScreen()));
+
+                }
+                else{
+                  widget.forgotPasswordViewModel.showErrorSnackbar(context, "There is no account with this email");
+                }
+
                 },
                 style: ButtonStyle(
                   minimumSize:

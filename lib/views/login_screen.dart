@@ -1,4 +1,5 @@
 import 'package:budget_buddy/views/home_screen.dart';
+import 'package:budget_buddy/views/sign_up_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../res/custom_color.dart';
@@ -140,7 +141,7 @@ class _SignInScreenState extends State<SignInScreen> {
             const SizedBox(height: 20),
             TextButton(
               onPressed: () {
-                Navigator.push(
+                Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
                       builder: (context) => ForgotPasswordScreen()),
@@ -153,7 +154,13 @@ class _SignInScreenState extends State<SignInScreen> {
             ),
             const SizedBox(height: 20),
             GestureDetector(
-              onTap: () {}, // => viewModel.navigateToSignUp(context)
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => SignUpPage()),
+                );
+              },
               child: const Text('Don’t have an account? Signup here',
                   style: TextStyle(
                       color: Colors.white,
