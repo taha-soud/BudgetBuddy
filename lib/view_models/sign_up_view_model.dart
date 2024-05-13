@@ -40,7 +40,6 @@ class SignUpViewModel {
           id:uid,
           username: username,
           email:email,
-          budget: null,
         );
 
         await FirebaseFirestore.instance
@@ -91,7 +90,6 @@ class SignUpViewModel {
           id: uid,
           username: fullname,
           email: email,
-          budget: null  // Assuming your user model handles a null budget initially
       );
 
       // Save the new user data to Firestore
