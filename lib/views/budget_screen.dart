@@ -1,9 +1,10 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-
 import 'package:budget_buddy/views/bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import '../models/budget_model.dart';
 import '../res/custom_color.dart';
+import '../services/budget_provider.dart';
+import 'package:provider/provider.dart';
 
 class BudgetScreen extends StatefulWidget {
   const BudgetScreen({Key? key}) : super(key: key);
@@ -13,21 +14,16 @@ class BudgetScreen extends StatefulWidget {
 }
 
 class _BudgetScreenState extends State<BudgetScreen> {
-  final List<String> months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  final List<String> months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   int currentMonthIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<BudgetProvider>(context, listen: false).fetchBudget(months[currentMonthIndex]);
+    });
+  }
 
   void _navigateBack() {
     setState(() {
@@ -35,17 +31,22 @@ class _BudgetScreenState extends State<BudgetScreen> {
       if (currentMonthIndex < 0) {
         currentMonthIndex = months.length - 1;
       }
+      Provider.of<BudgetProvider>(context, listen: false).fetchBudget(months[currentMonthIndex]);
     });
   }
 
   void _navigateForward() {
     setState(() {
       currentMonthIndex = (currentMonthIndex + 1) % months.length;
+      Provider.of<BudgetProvider>(context, listen: false).fetchBudget(months[currentMonthIndex]);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    var budgetProvider = Provider.of<BudgetProvider>(context);
+    var currentBudget = budgetProvider.currentBudget; // This might be null if data is not yet fetched
+
     return BottomBar(
       currentIndex: 2,
       child: Scaffold(
@@ -94,123 +95,118 @@ class _BudgetScreenState extends State<BudgetScreen> {
                 ),
               ),
             ),
-            SizedBox.fromSize(size: Size.fromHeight(90)),
-            Container(
-              child: Center(
-                child: Card(
-                  color: Colors.white,
-                  elevation: 3,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  margin: EdgeInsets.all(16),
-                  child: Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Column(
-                          children: [
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    color: const Color.fromARGB(
-                                        255, 208, 208, 208),
-                                    width: 2,
-                                  ),
-                                ),
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 12, vertical: 6),
-                                  child: Text(
-                                    months[currentMonthIndex] + " Budget",
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                'Remaining \$500',
-                                style: TextStyle(
-                                    fontSize: 35, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        SizedBox(
-                          height: 15,
-                          child: LinearProgressIndicator(
-                            value: (2500 / 3000),
-                            semanticsValue: '25%',
-                            backgroundColor: Colors.grey[300],
-                            minHeight: 10,
-                            semanticsLabel: 'Linear progress indicator',
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.blue),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          '\$2500 of \$3000',
-                          style: TextStyle(fontSize: 24, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            SizedBox.fromSize(size: Size.fromHeight(90)),
-            Container(
-              child: Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        // Add budget logic
-                      },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              AppColors.tertiary, // Customize button color
-                          fixedSize: Size(200, 70)),
-                      child: Text('Add Budget',
-                          style: TextStyle(color: Colors.white),
-                          textScaleFactor: 1.5),
-                    ),
-                    SizedBox(width: 16), // Add spacing between the buttons
-                    ElevatedButton(
-                      onPressed: () {
-                        // Edit budget logic
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            AppColors.tertiary, // Customize button color
-                        fixedSize: Size(200, 70),
-                      ),
-                      child: Text(
-                        'Edit Budget',
-                        style: TextStyle(color: Colors.white),
-                        textScaleFactor: 1.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            SizedBox(height: 90),
+            if (currentBudget != null) ...[
+              budgetCard(currentBudget),
+            ] else ...[
+              Center(child: CircularProgressIndicator()),
+            ],
+            SizedBox(height: 90),
+            addEditButtons(),
           ],
         ),
       ),
     );
   }
+
+  Widget budgetCard(Budget budget) => Container(
+    child: Center(
+      child: Card(
+        color: Colors.white,
+        elevation: 3,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        margin: EdgeInsets.all(16),
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Color.fromARGB(255, 208, 208, 208),
+                          width: 2,
+                        ),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        child: Text(
+                          "${months[currentMonthIndex]} Budget",
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Remaining \$${budget.totalRemaining.toStringAsFixed(2)}',
+                      style: const TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10),
+              LinearProgressIndicator(
+                value: budget.totalRemaining / budget.totalBudget,
+                backgroundColor: Colors.grey[300],
+                minHeight: 10,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              SizedBox(height: 10),
+              Text(
+                '\$${budget.totalRemaining.toStringAsFixed(2)} of \$${budget.totalBudget.toStringAsFixed(2)}',
+                style: TextStyle(fontSize: 24, color: Colors.grey),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+
+  Widget addEditButtons() => Container(
+    child: Center(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ElevatedButton(
+            onPressed: () {
+              // Add budget logic
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.tertiary,
+              fixedSize: Size(200, 70),
+            ),
+            child: Text('Add Budget',
+                style: TextStyle(color: Colors.white),
+                textScaleFactor: 1.5),
+          ),
+          SizedBox(width: 16), // Add spacing between the buttons
+          ElevatedButton(
+            onPressed: () {
+              // Edit budget logic
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.tertiary,
+              fixedSize: Size(200, 70),
+            ),
+            child: Text(
+                'Edit Budget',
+                style: TextStyle(color: Colors.white),
+                textScaleFactor: 1.5),
+          ),
+        ],
+      ),
+    ),
+  );
 }
