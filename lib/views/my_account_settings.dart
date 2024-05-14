@@ -15,7 +15,10 @@ class MyAccountSettingsScreen extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.pop(context)
+            onPressed: () {
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>const ProfileScreen()));
+
+            }
         ),
         title: const Text("My Account", style: TextStyle(color: Colors.white)),
         centerTitle: true,
@@ -51,8 +54,6 @@ class MyAccountSettingsScreen extends StatelessWidget {
   }
 }
 
-
-
 class ChangeDetailScreen extends StatefulWidget {
   final String detailType;
 
@@ -64,11 +65,14 @@ class ChangeDetailScreen extends StatefulWidget {
 
 class _ChangeDetailScreenState extends State<ChangeDetailScreen> {
   final TextEditingController _controller = TextEditingController();
+  final TextEditingController _confirmController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _obscureText = true;  // For new password
+  bool _confirmObscureText = true;  // For confirm password
 
   @override
   Widget build(BuildContext context) {
-    final userViewModel = Provider.of<UserViewModel>(context); // Now this should work without errors
+    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
@@ -88,31 +92,46 @@ class _ChangeDetailScreenState extends State<ChangeDetailScreen> {
           key: _formKey,
           child: Column(
             children: [
-              TextFormField(
-                controller: _controller,
-                style: TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  labelText: 'Enter new ${widget.detailType}',
-                  labelStyle: TextStyle(color: Colors.white),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
+              if (widget.detailType == "Password") ...[
+                buildPasswordField("Enter new password", _controller, _obscureText, () {
+                  setState(() { _obscureText = !_obscureText; });
+                }),
+                SizedBox(height: 20),
+                buildPasswordField("Confirm new password", _confirmController, _confirmObscureText, () {
+                  setState(() { _confirmObscureText = !_confirmObscureText; });
+                }),
+                SizedBox(height: 20),
+              ],
+              if (widget.detailType != "Password") ...[
+                TextFormField(
+                  controller: _controller,
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'Enter new ${widget.detailType}',
+                    labelStyle: TextStyle(color: Colors.white),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                  ),
+                  obscureText: false,
                 ),
-                obscureText: widget.detailType == "Password",
-                validator: (value) => userViewModel.validateDetail(value, widget.detailType),
-              ),
+              ],
               SizedBox(height: 20),
               ElevatedButton(
                 child: Text('Update ${widget.detailType}', style: TextStyle(color: Colors.white)),
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    String result = await userViewModel.updateUserDetail(widget.detailType, _controller.text.trim());
+                    String result = await userViewModel.updateUserDetail(
+                        widget.detailType,
+                        _controller.text.trim(),
+                        widget.detailType == "Password" ? _confirmController.text.trim() : null
+                    );
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result)));
                     if (result.endsWith("successfully.")) {
-                      Navigator.pop(context); // Optionally pop the screen if update is successful
+                      Navigator.pop(context);  // Optionally pop the screen if update is successful
                     }
                   }
                 },
@@ -122,6 +141,34 @@ class _ChangeDetailScreenState extends State<ChangeDetailScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget buildPasswordField(String label, TextEditingController controller, bool obscureText, VoidCallback toggleVisibility) {
+    return TextFormField(
+      controller: controller,
+      style: TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.white),
+        suffixIcon: IconButton(
+          icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility, color: Colors.white),
+          onPressed: toggleVisibility,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.white),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.white),
+        ),
+      ),
+      obscureText: obscureText,
+      validator: label == "Confirm new password" ? (value) {
+        if (value != _controller.text) {
+          return "Passwords do not match";
+        }
+        return null;
+      } : null,
     );
   }
 }
