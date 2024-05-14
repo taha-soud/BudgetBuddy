@@ -6,39 +6,29 @@ import 'package:flutter/material.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   ForgotPasswordScreen({super.key});
-  final ForgotPasswordViewModel forgotPasswordViewModel = ForgotPasswordViewModel();
+  final ForgotPasswordViewModel forgotPasswordViewModel =
+      ForgotPasswordViewModel();
 
   @override
   State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-    final TextEditingController _emailController = TextEditingController();
-
-
-
+  final TextEditingController _emailController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          AppColors.primary,
+      backgroundColor: AppColors.primary,
       appBar: AppBar(
         leading: IconButton(
-            icon: const Icon(Icons.arrow_back,
-                color: Colors.white),
-            onPressed: ()  => Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        SignInScreen()))
-            ),
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => SignInScreen()))),
         title: const Text("BudgetBuddy",
-            style:
-                TextStyle(color: AppColors.secondary)),
+            style: TextStyle(color: AppColors.secondary)),
         centerTitle: true,
-        backgroundColor:
-            Colors.transparent,
+        backgroundColor: Colors.transparent,
         elevation: 0,
       ),
       body: Padding(
@@ -46,7 +36,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(height: 80),
+            const SizedBox(height: 40),
             Container(
               alignment: Alignment.center,
               child: const Text(
@@ -57,40 +47,27 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     color: AppColors.secondary),
               ),
             ),
-            const SizedBox(height: 60),
+            const SizedBox(height: 40),
             Container(
               alignment: Alignment.center,
               child: const Text(
                 'Enter your email address below. We\'ll send you a link to reset your password.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 18, color: AppColors.secondary),
+                style: TextStyle(fontSize: 16, color: AppColors.secondary),
               ),
             ),
-            const SizedBox(height: 80),
+            const SizedBox(height: 20),
             Container(
-              alignment: Alignment.center,
-              child: Container(
-                alignment: Alignment.center,
-                height: 70,
-                width: 320,
-                decoration: BoxDecoration(
-                  borderRadius:
-                      BorderRadius.circular(30),
-                  color: AppColors.secondary,
+              child: TextFormField(
+                controller: _emailController,
+                decoration: const InputDecoration(
+                  hintText: 'Email',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(16))),
+                  filled: true,
+                  fillColor: Colors.white,
                 ),
-
-                child:  TextFormField(
-                  controller: _emailController,
-
-                  decoration: const InputDecoration(
-                    hintText: 'Email',
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                  ),
-                ),
-
               ),
-
             ),
             const SizedBox(
               height: 50,
@@ -99,16 +76,18 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               alignment: Alignment.center,
               child: ElevatedButton(
                 onPressed: () async {
-                if(await widget.forgotPasswordViewModel.checkEmail(_emailController.text.trim())){
-
-                  await widget.forgotPasswordViewModel.sendPasswordResetEmail(_emailController.text,context);
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  SignInScreen()));
-
-                }
-                else{
-                  widget.forgotPasswordViewModel.showErrorSnackbar(context, "There is no account with this email");
-                }
-
+                  if (await widget.forgotPasswordViewModel
+                      .checkEmail(_emailController.text.trim())) {
+                    await widget.forgotPasswordViewModel
+                        .sendPasswordResetEmail(_emailController.text, context);
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SignInScreen()));
+                  } else {
+                    widget.forgotPasswordViewModel.showErrorSnackbar(
+                        context, "There is no account with this email");
+                  }
                 },
                 style: ButtonStyle(
                   minimumSize:
