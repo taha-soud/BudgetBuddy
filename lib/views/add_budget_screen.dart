@@ -1,10 +1,12 @@
 import 'package:budget_buddy/views/home_screen.dart';
+import 'package:budget_buddy/views/you_are_set_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../res/custom_color.dart';
 import '../view_models/add_budget_viewmodel.dart';
 
 class AddBudgetScreen extends StatefulWidget {
+
   const AddBudgetScreen({super.key});
 
   @override
@@ -60,7 +62,7 @@ class _AddBudgetScreenState extends State<AddBudgetScreen> {
             ),
             TextField(
               controller: balanceController,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
               style: const TextStyle(fontSize: 48.0, fontWeight: FontWeight.bold, color: Colors.white),
               decoration: InputDecoration(
                 border: InputBorder.none,
@@ -130,7 +132,7 @@ class _AddBudgetScreenState extends State<AddBudgetScreen> {
                   if (currentUser != null) {
                     if (nameController.text.isEmpty || balanceController.text.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Please fill in all fields'), backgroundColor: Colors.red)
+                          const SnackBar(content: Text('Please fill in all fields'), backgroundColor: Colors.red)
                       );
                     } else {
                       await budgetViewModel.saveBudget(
@@ -140,13 +142,15 @@ class _AddBudgetScreenState extends State<AddBudgetScreen> {
                           noteController.text,
                           selectedFrequency
                       );
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const YouAreSetPage()));
                       ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Budget saved successfully'), backgroundColor: Colors.green)
-                      );
+                          const SnackBar(content: Text('Budget saved successfully'), backgroundColor: Colors.green)
+
+                  );
                     }
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('No user signed in'), backgroundColor: Colors.red)
+                        const SnackBar(content: Text('No user signed in'), backgroundColor: Colors.red)
                     );
                   }
                   setState(() {
@@ -158,7 +162,7 @@ class _AddBudgetScreenState extends State<AddBudgetScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                   minimumSize: const Size(230, 60), // Set the size
                 ),
-                child: isSaving ? CircularProgressIndicator(color: Colors.white) : const Text('Save', style: TextStyle(color: Colors.white, fontSize: 23)),
+                child: isSaving ? const CircularProgressIndicator(color: Colors.white) : const Text('Save', style: TextStyle(color: Colors.white, fontSize: 23)),
               ),
             ),
           ],
