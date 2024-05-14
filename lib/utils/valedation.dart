@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+
 class Validator{
 
   static String? validateFullName(String? name) {
@@ -50,6 +52,25 @@ class Validator{
     }
     return null;
   }
+
+  static Future<String?> validateEmailAvailability(String email) async {
+    try {
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: '',
+      );
+      return null;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        return 'The email address is already in use by another account.';
+      } else {
+        return 'Failed to check email availability';
+      }
+    } catch (error) {
+      return 'Failed to check email availability';
+    }
+  }
+
 
 //Add any new validation here
 }

@@ -1,12 +1,12 @@
-import 'package:budget_buddy/utils/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'views/splash_screen.dart'; // Import the splash screen widget
-void main() {
-WidgetsFlutterBinding.ensureInitialized();
-Firebase.initializeApp();
-options: DefaultFirebaseOptions.currentPlatform;
+import 'views/login_screen.dart';
 
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -16,16 +16,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Budget Buddy',
-      theme: ThemeData(
-        primarySwatch: Colors.teal,
-      ),
-    // Start with the SplashScreen
-      home:  const SplashScreen() // Start with the SplashScreen
-    );
+        title: 'Budget Buddy',
+        theme: ThemeData(
+          primarySwatch: Colors.teal,
+        ),
+        // Start with the SplashScreen
+        home: SignInScreen() // Start with the SplashScreen
+        );
   }
 }
-
-
-
-
