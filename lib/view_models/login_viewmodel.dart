@@ -1,3 +1,4 @@
+import 'package:budget_buddy/views/my_account_settings.dart';
 import 'package:budget_buddy/views/sign_up_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -40,7 +41,7 @@ class SignInViewModel {
         email: email,
         password: password,
       );
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomeScreen()));
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => MyAccountSettingsScreen()));
     } on FirebaseAuthException catch (e) {
       String errorMessage = "Invalid email or password.";
       if (e.code == 'user-not-found' || e.code == 'wrong-password') {
