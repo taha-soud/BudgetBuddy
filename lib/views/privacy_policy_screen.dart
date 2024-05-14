@@ -12,11 +12,11 @@ class PrivacyPolicyScreen extends StatelessWidget {
       backgroundColor: AppColors.primary,
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: AppColors.secondary),
           onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  const ProfileScreen()))
           ,
         ),
-        title: const Text("Privacy Policy", style: TextStyle(color: Colors.white)),
+        title: const Text("Privacy Policy", style: TextStyle(color: AppColors.secondary)),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,

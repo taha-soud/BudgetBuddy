@@ -12,10 +12,10 @@ class AboutAppScreen extends StatelessWidget {
       backgroundColor: AppColors.primary,
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: AppColors.secondary),
             onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  const ProfileScreen()))
         ),
-        title: const Text("About App", style: TextStyle(color: Colors.white)),
+        title: const Text("About App", style: TextStyle(color: AppColors.secondary)),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -26,14 +26,14 @@ class AboutAppScreen extends StatelessWidget {
           children: [
             Container(
               height: 1,
-              color: Colors.white,
+              color: AppColors.secondary,
             ),
             const SizedBox(height: 20),
             const Text(
               'Welcome to Budget buddy, your go-to budget tracking solution. '
                   'We\'re dedicated to simplifying finances and helping you achieve your financial goals effortlessly. '
                   'With Budget buddy, managing your budget is a breeze. Join us today and take control of your finances with ease!',
-              style: TextStyle(color: Colors.white,fontSize: 25,fontWeight: FontWeight.bold),
+              style: TextStyle(color: AppColors.secondary,fontSize: 25,fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
           ],

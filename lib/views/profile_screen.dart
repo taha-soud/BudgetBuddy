@@ -1,12 +1,20 @@
-import 'package:budget_buddy/views/about_app_screen.dart';
-import 'package:budget_buddy/views/my_account_settings.dart';
 import 'package:budget_buddy/views/privacy_policy_screen.dart';
 import 'package:flutter/material.dart';
 import '../res/custom_color.dart';
+import '../view_models/profile_view_model.dart';
+import 'about_app_screen.dart';
 import 'bottom_bar.dart';
+import 'my_account_settings.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key});
+
+  @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final ProfileViewModel _viewModel = ProfileViewModel();
 
   @override
   Widget build(BuildContext context) {
@@ -19,32 +27,41 @@ class ProfileScreen extends StatelessWidget {
           child: Center(
             child: Column(
               children: [
-                const Center(
-                  child: Column(
-                    children: [
-                      CircleAvatar(
-                        radius: 80,
-                        backgroundColor: AppColors.secondary,
-                        child: Icon(
-                          Icons.person,
-                          size: 120,
-                          color: AppColors.colorIcon,
-                        ),
-                      ),
-                      SizedBox(height: 25),
-                      Text(
-                        'Izz Moqbel',
-                        style: TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
+                FutureBuilder(
+                  future: _viewModel.getUserName(),
+                  builder: (context, AsyncSnapshot<String?> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      final userName = snapshot.data ?? 'User Name';
+                      return Column(
+                        children: [
+                          const CircleAvatar(
+                            radius: 80,
+                            backgroundColor: AppColors.secondary,
+                            child: Icon(
+                              Icons.person,
+                              size: 120,
+                              color: AppColors.colorIcon,
+                            ),
+                          ),
+                          const SizedBox(height: 25),
+                          Text(
+                            userName,
+                            style: const TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.secondary,
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                  },
                 ),
                 const SizedBox(height: 25),
-
                 SizedBox(
                   height: 200,
                   child: Card(
@@ -75,7 +92,7 @@ class ProfileScreen extends StatelessWidget {
                             subtitle: const Text('Log out from here'),
                             trailing: const Icon(Icons.arrow_forward_ios),
                             onTap: () {
-                              // Perform log out action
+                              _viewModel.logout(context);
                             },
                           ),
                         ),
@@ -127,15 +144,13 @@ class ProfileScreen extends StatelessWidget {
                             subtitle: const Text('Learn more about the app'),
                             trailing: const Icon(Icons.arrow_forward_ios),
                             onTap: () {
-                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  const AboutAppScreen()));
-                            },
+                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  const AboutAppScreen()));                            },
                           ),
                         ),
                       ],
                     ),
                   ),
-                ),
-              ],
+                ),              ],
             ),
           ),
         ),

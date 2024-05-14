@@ -1,3 +1,4 @@
+import 'package:budget_buddy/views/profile_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../res/custom_color.dart';
@@ -12,7 +13,7 @@ class MyAccountSettingsScreen extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  const ProfileScreen()))
         ),
         title: const Text("My Account", style: TextStyle(color: Colors.white)),
         centerTitle: true,  // Center the title
