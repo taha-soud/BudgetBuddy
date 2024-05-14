@@ -1,13 +1,24 @@
-import 'package:budget_buddy/utils/firebase_options.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:budget_buddy/view_models/add_budget_viewmodel.dart';
+import 'package:budget_buddy/views/splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'views/splash_screen.dart'; // Import the splash screen widget
-void main() {
-WidgetsFlutterBinding.ensureInitialized();
-Firebase.initializeApp();
-options: DefaultFirebaseOptions.currentPlatform;
+import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:budget_buddy/utils/firebase_options.dart';  // Ensure you have firebase_options.dart configured
 
-  runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Ensures all bindings are initialized correctly
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform, // Ensure your Firebase options are correctly set up
+  );
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => BudgetViewModel()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -20,12 +31,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.teal,
       ),
-    // Start with the SplashScreen
-      home:  const SplashScreen() // Start with the SplashScreen
+      home: const SplashScreen(),
     );
   }
 }
-
-
-
-

@@ -1,11 +1,15 @@
 class Budget {
   final String id;
+  final String budgetName;
+  final String note;
   final DateTime fromDate;
   final DateTime toDate;
   final double totalRemaining;
   final double totalBudget;
 
   Budget({
+    required this.budgetName,
+    required this.note,
     required this.id,
     required this.fromDate,
     required this.toDate,
@@ -16,6 +20,8 @@ class Budget {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'note': note,
+      'budgetName': budgetName,
       'fromDate': fromDate.toIso8601String(),
       'toDate': toDate.toIso8601String(),
       'totalRemaining': totalRemaining,
@@ -26,6 +32,8 @@ class Budget {
   factory Budget.fromJson(Map<String, dynamic> json) {
     return Budget(
       id: json['id'],
+      note:json['note'],
+      budgetName: json['budgetName'],
       fromDate: DateTime.parse(json['fromDate']),
       toDate: DateTime.parse(json['toDate']),
       totalRemaining: json['totalRemaining'],
