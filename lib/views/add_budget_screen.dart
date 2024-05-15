@@ -14,7 +14,7 @@ class AddBudgetScreen extends StatefulWidget {
 }
 
 class _AddBudgetScreenState extends State<AddBudgetScreen> {
-  final BudgetViewModel budgetViewModel = BudgetViewModel();  // Initializing the view model
+  final AddBudgetViewModel budgetViewModel = AddBudgetViewModel();  // Initializing the view model
   final TextEditingController balanceController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController noteController = TextEditingController();

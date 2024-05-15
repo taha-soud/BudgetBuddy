@@ -14,7 +14,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => BudgetViewModel()),
+        ChangeNotifierProvider(create: (_) => AddBudgetViewModel()),
       ],
       child: const MyApp(),
     ),

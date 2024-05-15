@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/budget_model.dart';
 
-class BudgetViewModel extends ChangeNotifier {
+class AddBudgetViewModel extends ChangeNotifier {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseAuth auth = FirebaseAuth.instance;  // Firebase Authentication instance
   final Uuid uuid = Uuid();
