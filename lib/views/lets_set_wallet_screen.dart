@@ -1,8 +1,11 @@
 import 'package:budget_buddy/views/add_budget_screen.dart';
+import 'package:budget_buddy/views/bottom_bar.dart';
+import 'package:budget_buddy/views/home_screen.dart';
 import 'package:budget_buddy/views/you_are_set_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../res/custom_color.dart';
+
 class WalletSetupPage extends StatelessWidget {
   const WalletSetupPage({super.key});
 
@@ -44,19 +47,26 @@ class WalletSetupPage extends StatelessWidget {
             const SizedBox(height: 40),
             ElevatedButton(
               onPressed: () {
-               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const AddBudgetScreen()));
-
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    // builder: (context) => const AddBudgetScreen(),
+                    builder: (context) => HomeScreen(),
+                  ),
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.tertiary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 7),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 50, vertical: 7),
               ),
               child: const Padding(
                 padding: EdgeInsets.symmetric(vertical: 12.0),
-                child: Text("Let's go",
+                child: Text(
+                  "Let's go",
                   style: TextStyle(
                     fontSize: 20,
                     color: Colors.white,
