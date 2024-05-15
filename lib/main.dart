@@ -1,17 +1,24 @@
-
-import 'package:budget_buddy/view_models/update_settings_viewmodel.dart';
-import 'package:budget_buddy/views/login_screen.dart';
+import 'package:budget_buddy/view_models/add_budget_viewmodel.dart';
 import 'package:budget_buddy/views/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:budget_buddy/utils/firebase_options.dart'; // 
+import 'package:budget_buddy/utils/firebase_options.dart';  // Ensure you have firebase_options.dart configured
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized(); // Ensures all bindings are initialized correctly
   await Firebase.initializeApp(
-  options: DefaultFirebaseOptions.
-  runApp(MyApp());
+    options: DefaultFirebaseOptions.currentPlatform, // Ensure your Firebase options are correctly set up
+  );
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => BudgetViewModel()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -19,18 +26,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    return ChangeNotifierProvider<UserViewModel>(
-      create: (context) => UserViewModel(),
-      child: MaterialApp(
-        title: 'Budget Buddy',
-        theme: ThemeData(
-          primarySwatch: Colors.teal,
-        ),
-        home: SplashScreen(),
+    return MaterialApp(
+      title: 'Budget Buddy',
+      theme: ThemeData(
+        primarySwatch: Colors.teal,
       ),
+      home: const SplashScreen(),
     );
-        
-       
   }
 }

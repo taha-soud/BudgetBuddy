@@ -52,7 +52,7 @@ class LandingPage extends StatelessWidget {
             const SizedBox(height: 40),
             ElevatedButton(
               onPressed: () {
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>SignUpPage() ));
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>SignInScreen() ));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.tertiary,
