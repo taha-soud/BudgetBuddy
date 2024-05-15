@@ -1,17 +1,16 @@
+
 import 'package:budget_buddy/view_models/update_settings_viewmodel.dart';
 import 'package:budget_buddy/views/login_screen.dart';
 import 'package:budget_buddy/views/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:budget_buddy/utils/firebase_options.dart'; // Ensure this is correctly set up
+import 'package:budget_buddy/utils/firebase_options.dart'; // 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
+  options: DefaultFirebaseOptions.
   runApp(MyApp());
 }
 
@@ -20,6 +19,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return ChangeNotifierProvider<UserViewModel>(
       create: (context) => UserViewModel(),
       child: MaterialApp(
@@ -30,5 +30,7 @@ class MyApp extends StatelessWidget {
         home: SplashScreen(),
       ),
     );
+        
+       
   }
 }

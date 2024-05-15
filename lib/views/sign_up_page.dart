@@ -3,7 +3,7 @@ import 'package:budget_buddy/views/home_screen.dart';
 import 'package:flutter/material.dart';
 import '../res/custom_color.dart';
 import '../utils/valedation.dart';
-import '../view_models/sign_up_view_model.dart';
+import '../view_models/sign_up_viewmodel.dart';
 import 'lets_set_wallet_screen.dart';
 import 'login_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -212,6 +212,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             SnackBar(
                               content: Text(errorMessage),
                               duration: const Duration(seconds: 5),
+                              backgroundColor: Colors.red,
                             ),
                           );
                         } catch (error) {
@@ -219,6 +220,8 @@ class _SignUpPageState extends State<SignUpPage> {
                             const SnackBar(
                               content: Text('Failed to sign up'),
                               duration: Duration(seconds: 5),
+                              backgroundColor: Colors.red,
+
                             ),
                           );
                         }

@@ -52,6 +52,7 @@ class Validator{
     }
     return null;
   }
+
   static Future<String?> validateEmailAvailability(String email) async {
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -69,5 +70,5 @@ class Validator{
       return 'Failed to check email availability';
     }
   }
-//Add any new validation here
+
 }
