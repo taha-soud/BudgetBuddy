@@ -1,3 +1,4 @@
+import 'package:budget_buddy/view_models/budget_view_model.dart';
 import 'package:budget_buddy/views/add_budget_screen.dart';
 import 'package:budget_buddy/views/bottom_bar.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,233 +17,176 @@ class BudgetScreen extends StatefulWidget {
 }
 
 class _BudgetScreenState extends State<BudgetScreen> {
-  final List<String> months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December"
-  ];
-  int currentMonthIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<BudgetProvider>(context, listen: false)
-          .fetchBudget(months[currentMonthIndex]);
-    });
-  }
-
-  void _navigateBack() {
-    setState(() {
-      currentMonthIndex = (currentMonthIndex - 1) % months.length;
-      if (currentMonthIndex < 0) {
-        currentMonthIndex = months.length - 1;
-      }
-      Provider.of<BudgetProvider>(context, listen: false)
-          .fetchBudget(months[currentMonthIndex]);
-    });
-  }
-
-  void _navigateForward() {
-    setState(() {
-      currentMonthIndex = (currentMonthIndex + 1) % months.length;
-      Provider.of<BudgetProvider>(context, listen: false)
-          .fetchBudget(months[currentMonthIndex]);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Consumer<BudgetProvider>(
-      builder: (_, budgetProvider, __) {
-        return BottomBar(
-          currentIndex: 2,
-          child: Scaffold(
-            backgroundColor: AppColors.primary,
-            appBar: PreferredSize(
-              preferredSize: const Size.fromHeight(72.0),
-              child: AppBar(
-                backgroundColor: AppColors.primary,
-                title: const Padding(
-                  padding: EdgeInsets.only(top: 20.0),
-                  child: Text('Budget',
-                      style: TextStyle(color: Colors.white),
-                      textScaleFactor: 1.5),
+    return ChangeNotifierProvider(
+      create: (_) => BudgetViewModel(context),
+      child: Consumer<BudgetViewModel>(
+        builder: (_, viewModel, __) {
+          return BottomBar(
+            currentIndex: 2,
+            child: Scaffold(
+              backgroundColor: AppColors.primary,
+              appBar: PreferredSize(
+                preferredSize: const Size.fromHeight(72.0),
+                child: AppBar(
+                  backgroundColor: AppColors.primary,
+                  title: const Padding(
+                    padding: EdgeInsets.only(top: 20.0),
+                    child: Text('Budget',
+                        style: TextStyle(color: Colors.white),
+                        textScaleFactor: 1.5),
+                  ),
+                  centerTitle: true,
                 ),
-                centerTitle: true,
               ),
-            ),
-            body: ListView(
-              children: [
-                Container(
-                  height: 100,
-                  color: AppColors.primary, // Third row
-                  child: Center(
-                    child: Row(
-                      children: [
-                        IconButton(
-                          onPressed: _navigateBack,
-                          icon: Icon(Icons.arrow_back),
-                          color: Colors.white,
-                          iconSize: 35,
-                        ),
-                        Expanded(
-                          child: Center(
-                            child: Text(
-                              months[currentMonthIndex],
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 28),
+              body: ListView(
+                children: [
+                  Container(
+                    height: 100,
+                    color: AppColors.primary, // Third row
+                    child: Center(
+                      child: Row(
+                        children: [
+                          IconButton(
+                            onPressed: () => viewModel.navigateBack(context),
+                            icon: Icon(Icons.arrow_back),
+                            color: Colors.white,
+                            iconSize: 35,
+                          ),
+                          Expanded(
+                            child: Center(
+                              child: Text(
+                                viewModel.months[viewModel.currentMonthIndex],
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 28),
+                              ),
                             ),
                           ),
-                        ),
-                        IconButton(
-                          onPressed: _navigateForward,
-                          icon: Icon(Icons.arrow_forward),
-                          color: Colors.white,
-                          iconSize: 35,
-                        ),
-                      ],
+                          IconButton(
+                            onPressed: () => viewModel.navigateForward(context),
+                            icon: Icon(Icons.arrow_forward),
+                            color: Colors.white,
+                            iconSize: 35,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 90),
-                // if (currentBudget != null) ...[
-                budgetCard(
-                  budgetProvider.currentBudget ??
-                      Budget(
-                          id: '',
-                          fromDate: DateTime.now(),
-                          toDate: DateTime.now(),
-                          totalRemaining: 1,
-                          totalBudget: 1,
-                          budgetName: '',
-                          note: ''),
-                ),
-                // ] else ...[
-                //   const Center(child: CircularProgressIndicator()),
-                // ],
-                const SizedBox(height: 90),
-                addEditButtons(),
-              ],
+                  const SizedBox(height: 90),
+                  Consumer<BudgetProvider>(
+                    builder: (_, budgetProvider, __) {
+                      final currentBudget = budgetProvider.currentBudget;
+                      return budgetCard(
+                        currentBudget ??
+                            Budget(
+                              id: '',
+                              fromDate: DateTime.now(),
+                              toDate: DateTime.now(),
+                              totalRemaining: 1,
+                              totalBudget: 1,
+                              // budgetName: '',
+                              // note: ''
+                            ),
+                      );
+                    },
+                  ),
+                  // ] else ...[
+                  //   const Center(child: CircularProgressIndicator()),
+                  // ],
+                  const SizedBox(height: 90),
+                  addEditButtons(),
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
   Widget budgetCard(Budget budget) => Center(
-    child: Card(
-      color: Colors.white,
-      elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      margin: EdgeInsets.all(16),
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Column(
+        child: Card(
+          color: Colors.white,
+          elevation: 3,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          margin: EdgeInsets.all(16),
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: Color.fromARGB(255, 208, 208, 208),
-                        width: 2,
+                Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: Color.fromARGB(255, 208, 208, 208),
+                            width: 2,
+                          ),
+                        ),
+                        child: Padding(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          child: Consumer<BudgetViewModel>(
+                            builder: (_, viewModel, __) {
+                              return Text(
+                                '${viewModel.months[viewModel.currentMonthIndex]} Budget',
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                              );
+                            },
+                          ),
+                        ),
                       ),
                     ),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
+                    SizedBox(height: 10),
+                    Align(
+                      alignment: Alignment.centerLeft,
                       child: Text(
-                        "${months[currentMonthIndex]} Budget",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                        'Remaining \$${budget.totalRemaining.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                            fontSize: 35, fontWeight: FontWeight.bold),
                       ),
                     ),
-                  ),
+                  ],
                 ),
                 SizedBox(height: 10),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Remaining \$${budget.totalRemaining.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                        fontSize: 35, fontWeight: FontWeight.bold),
-                  ),
+                LinearProgressIndicator(
+                  value: budget.totalRemaining / budget.totalBudget,
+                  backgroundColor: Colors.grey[300],
+                  minHeight: 10,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  '\$${budget.totalRemaining.toStringAsFixed(2)} of \$${budget.totalBudget.toStringAsFixed(2)}',
+                  style: TextStyle(fontSize: 24, color: Colors.grey),
                 ),
               ],
             ),
-            SizedBox(height: 10),
-            LinearProgressIndicator(
-              value: budget.totalRemaining / budget.totalBudget,
-              backgroundColor: Colors.grey[300],
-              minHeight: 10,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            SizedBox(height: 10),
-            Text(
-              '\$${budget.totalRemaining.toStringAsFixed(2)} of \$${budget.totalBudget.toStringAsFixed(2)}',
-              style: TextStyle(fontSize: 24, color: Colors.grey),
-            ),
-          ],
+          ),
         ),
-      ),
-    ),
-  );
+      );
 
   Widget addEditButtons() => Container(
         child: Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => AddBudgetScreen()));
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.tertiary,
-                  fixedSize: Size(200, 70),
-                ),
-                child: Text('Add Budget',
-                    style: TextStyle(color: Colors.white),
-                    textScaleFactor: 1.5),
-              ),
-              const SizedBox(width: 16), // Add spacing between the buttons
-              Flexible(
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Edit budget logic
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.tertiary,
-                    fixedSize: Size(200, 70),
-                  ),
-                  child: Text('Edit Budget',
-                      style: TextStyle(color: Colors.white),
-                      textScaleFactor: 1.5),
-                ),
-              ),
-            ],
+          child: ElevatedButton(
+            onPressed: () {
+              // Edit budget logic
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.tertiary,
+              fixedSize: Size(300, 70),
+            ),
+            child: Text('Edit Budget',
+                style: TextStyle(color: Colors.white), textScaleFactor: 1.5),
           ),
         ),
       );
