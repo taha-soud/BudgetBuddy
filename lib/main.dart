@@ -1,10 +1,12 @@
+
 import 'package:budget_buddy/view_models/add_budget_viewmodel.dart';
 import 'package:budget_buddy/views/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:budget_buddy/utils/firebase_options.dart';  // Ensure you have firebase_options.dart configured
+import 'package:budget_buddy/utils/firebase_options.dart';
 
+  // Ensure you have firebase_options.dart configure
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensures all bindings are initialized correctly
   await Firebase.initializeApp(
@@ -26,12 +28,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Budget Buddy',
-      theme: ThemeData(
-        primarySwatch: Colors.teal,
-      ),
-      home: const SplashScreen(),
+    return ChangeNotifierProvider(
+      create: (_) => BudgetProvider(),
+      child: MaterialApp(
+        title: 'Budget Buddy',
+        theme: ThemeData(
+          primarySwatch: Colors.teal,
+        ),
+              home: const SplashScreen(),
+
     );
   }
 }
+ 
