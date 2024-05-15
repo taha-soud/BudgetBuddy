@@ -71,6 +71,4 @@ class Validator{
     }
   }
 
-
-//Add any new validation here
 }
