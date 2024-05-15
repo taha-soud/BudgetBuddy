@@ -3,7 +3,7 @@ import 'package:budget_buddy/views/home_screen.dart';
 import 'package:flutter/material.dart';
 import '../res/custom_color.dart';
 import '../utils/valedation.dart';
-import '../view_models/sign_up_view_model.dart';
+import '../view_models/sign_up_viewmodel.dart';
 import 'lets_set_wallet_screen.dart';
 import 'login_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -25,6 +25,8 @@ class _SignUpPageState extends State<SignUpPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   SignUpViewModel? viewModel;
   get signUpViewModel => null;
+  bool _passwordVisible = false;
+  bool _confirmPasswordVisible=false;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +57,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   onPressed: () async {
                     try {
                       await widget.signUpViewModel.signUpWithGoogle();
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => WalletSetupPage()));
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const WalletSetupPage()));
 
                     } on FirebaseAuthException catch (e) {
                       String errorMessage = 'Failed to sign in with Google';
@@ -124,29 +126,51 @@ class _SignUpPageState extends State<SignUpPage> {
                 const SizedBox(height: 10.0),
                 TextFormField(
                   controller: _passwordController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'Password',
-                    border: OutlineInputBorder(
+                    border: const OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(16)),
                     ),
                     filled: true,
                     fillColor: Colors.white,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _passwordVisible ? Icons.visibility : Icons.visibility_off,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _passwordVisible = !_passwordVisible;
+                        });
+                      },
+                    ),
                   ),
-                  obscureText: true,
+                  obscureText: !_passwordVisible,
                   onChanged: (_) => _formKey.currentState!.validate(),
                   validator: Validator.validatePassword,
                 ),
                 const SizedBox(height: 10.0),
                 TextFormField(
                   controller: _confirmPasswordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
+                  obscureText: !_confirmPasswordVisible,
+                  decoration: InputDecoration(
                     hintText: 'Confirm Password',
-                    border: OutlineInputBorder(
+                    border: const OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(16)),
                     ),
                     filled: true,
                     fillColor: Colors.white,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _confirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _confirmPasswordVisible = !_confirmPasswordVisible;
+                        });
+                      },
+                    ),
                   ),
                   onChanged: (_) => _formKey.currentState!.validate(),
                   validator: (value) => Validator.validateConfirmPassword(value, _passwordController.text),
@@ -173,7 +197,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               email: _emailController.text.trim(),
                               password: _passwordController.text.trim(),
                             );
-                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  WalletSetupPage()));
+                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  const WalletSetupPage()));
                           }
                         } on FirebaseAuthException catch (e) {
                           String errorMessage = 'Failed to sign up';
@@ -188,6 +212,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             SnackBar(
                               content: Text(errorMessage),
                               duration: const Duration(seconds: 5),
+                              backgroundColor: Colors.red,
                             ),
                           );
                         } catch (error) {
@@ -195,6 +220,8 @@ class _SignUpPageState extends State<SignUpPage> {
                             const SnackBar(
                               content: Text('Failed to sign up'),
                               duration: Duration(seconds: 5),
+                              backgroundColor: Colors.red,
+
                             ),
                           );
                         }

@@ -1,12 +1,16 @@
-import 'package:budget_buddy/utils/firebase_options.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'views/splash_screen.dart'; // Import the splash screen widget
-void main() {
-WidgetsFlutterBinding.ensureInitialized();
-Firebase.initializeApp();
-options: DefaultFirebaseOptions.currentPlatform;
 
+import 'package:budget_buddy/view_models/update_settings_viewmodel.dart';
+import 'package:budget_buddy/views/login_screen.dart';
+import 'package:budget_buddy/views/splash_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:budget_buddy/utils/firebase_options.dart'; // 
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+  options: DefaultFirebaseOptions.
   runApp(MyApp());
 }
 
@@ -15,17 +19,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Budget Buddy',
-      theme: ThemeData(
-        primarySwatch: Colors.teal,
+
+    return ChangeNotifierProvider<UserViewModel>(
+      create: (context) => UserViewModel(),
+      child: MaterialApp(
+        title: 'Budget Buddy',
+        theme: ThemeData(
+          primarySwatch: Colors.teal,
+        ),
+        home: SplashScreen(),
       ),
-    // Start with the SplashScreen
-      home:  const SplashScreen() // Start with the SplashScreen
     );
+        
+       
   }
 }
-
-
-
-

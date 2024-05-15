@@ -55,17 +55,7 @@ class SignUpViewModel {
       print(e.toString());
     }
   }
-  Future<String?> checkEmailInUse(String email) async {
-    try {
-      var signInMethods = await _auth.fetchSignInMethodsForEmail(email);
-      if (signInMethods.isNotEmpty) {
-        return "The email address is already in use by another account.";
-      }
-      return null;
-    } catch (e) {
-      return "Failed to check email: ${e.toString()}";
-    }
-  }
+
 
   Future<void> signUpWithEmail({
     required String fullname,
@@ -73,10 +63,7 @@ class SignUpViewModel {
     required String password,
   }) async {
     try {
-      // Check if the email is already in use before creating a new user
-      await checkEmailInUse(email);
 
-      // Create a new user with email and password
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
           email: email,
           password: password
@@ -91,13 +78,11 @@ class SignUpViewModel {
           id: uid,
           username: fullname,
           email: email,
-          budget: null  // Assuming your user model handles a null budget initially
+          budget: null
       );
 
-      // Save the new user data to Firestore
       await FirebaseFirestore.instance.collection('users').doc(uid).set(newUser.toJson());
 
-      // Optionally, you can send a verification email here
       await userCredential.user!.sendEmailVerification();
 
     } catch (e) {
@@ -106,7 +91,5 @@ class SignUpViewModel {
     }
   }
 
-  void navigateToLoginPage() {
-    // This method would navigate back to the login page, implement as needed
-  }
+
 }
