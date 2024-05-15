@@ -51,7 +51,7 @@ class WalletSetupPage extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     // builder: (context) => const AddBudgetScreen(),
-                    builder: (context) => HomeScreen(),
+                    builder: (context) => AddBudgetScreen(),
                   ),
                 );
               },
