@@ -11,7 +11,6 @@ class CategoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Define the list of category types
     final List<String> categoryTypes = ['Food and Drink', 'Transportation', 'Lifestyle', 'My Categorises'];
 
     return Scaffold(
@@ -25,9 +24,7 @@ class CategoryScreen extends StatelessWidget {
           onPressed: () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(
-                  builder: (context) => const ExpenseScreen()
-              ),
+              MaterialPageRoute(builder: (context) => const ExpenseScreen(category: null)),
             );
           },
         ),
@@ -37,9 +34,7 @@ class CategoryScreen extends StatelessWidget {
             onPressed: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                    builder: (context) => const AddCategoryScreen()
-                ),
+                MaterialPageRoute(builder: (context) => const AddCategoryScreen()),
               );
             },
           )
@@ -94,8 +89,12 @@ class CategoryScreen extends StatelessWidget {
                             final IconData iconData = getIconData(category.icon);
                             return GestureDetector(
                               onTap: () {
-                                // Handle button tap here
-                                print('${category.name} button tapped');
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ExpenseScreen(category: category),
+                                  ),
+                                );
                               },
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
