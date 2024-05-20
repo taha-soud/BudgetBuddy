@@ -25,4 +25,11 @@ class CategoryService {
     return querySnapshot.docs.map((doc) => Category.fromJson(doc.data() as Map<String, dynamic>)).toList();
   }
 
+  Future<void> addCategory(Category category) async {
+    try {
+      await _categoriesCollection.add(category.toJson());
+    } catch (e) {
+      throw Exception('Failed to add category: $e');
+    }
+  }
 }
