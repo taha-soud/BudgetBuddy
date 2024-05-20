@@ -1,18 +1,23 @@
-import 'package:budget_buddy/views/add_category_screen.dart';
-import 'package:budget_buddy/views/expense_screen.dart';
 import 'package:flutter/material.dart';
 import '../models/category_model.dart';
 import '../res/custom_color.dart';
 import '../services/category_service.dart';
 import '../utils/icons.dart';
+import 'add_category_screen.dart';
+import 'expense_screen.dart';
 
-class CategoryScreen extends StatelessWidget {
-  const CategoryScreen({super.key});
+class CategoryScreen extends StatefulWidget {
+  const CategoryScreen({Key? key}) : super(key: key);
+
+  @override
+  _CategoryScreenState createState() => _CategoryScreenState();
+}
+
+class _CategoryScreenState extends State<CategoryScreen> {
+  final List<String> categoryTypes = ['Food and Drink', 'Transportation', 'Lifestyle', 'My Categories'];
 
   @override
   Widget build(BuildContext context) {
-    final List<String> categoryTypes = ['Food and Drink', 'Transportation', 'Lifestyle', 'My Categorises'];
-
     return Scaffold(
       backgroundColor: AppColors.primary,
       appBar: AppBar(
