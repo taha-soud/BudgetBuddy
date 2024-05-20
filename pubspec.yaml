@@ -43,7 +43,7 @@ dependencies:
   cloud_firestore: ^4.17.2
   fluttertoast: ^8.2.5
   logger: ^2.2.0
-
+  fl_chart: ^0.68.0
 
 
 dev_dependencies:
