@@ -1,6 +1,7 @@
 
 import 'package:budget_buddy/services/budget_provider.dart';
 import 'package:budget_buddy/view_models/add_budget_viewmodel.dart';
+import 'package:budget_buddy/view_models/update_settings_viewmodel.dart';
 import 'package:budget_buddy/views/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,17 +10,18 @@ import 'package:budget_buddy/utils/firebase_options.dart';
 
   // Ensure you have firebase_options.dart configure
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Ensures all bindings are initialized correctly
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform, // Ensure your Firebase options are correctly set up
+    options: DefaultFirebaseOptions.currentPlatform,
   );
 
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => BudgetViewModel()),
+        ChangeNotifierProvider(create: (_) => UserViewModel()),
+        ChangeNotifierProvider(create: (_) => AddBudgetViewModel()),
       ],
-      child: const MyApp(),
+      child: MyApp(),
     ),
   );
 }

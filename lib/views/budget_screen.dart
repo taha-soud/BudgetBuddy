@@ -1,6 +1,7 @@
 import 'package:budget_buddy/view_models/budget_view_model.dart';
 import 'package:budget_buddy/views/add_budget_screen.dart';
 import 'package:budget_buddy/views/bottom_bar.dart';
+import 'package:budget_buddy/views/edit_budget_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -85,8 +86,10 @@ class _BudgetScreenState extends State<BudgetScreen> {
                               toDate: DateTime.now(),
                               totalRemaining: 1,
                               totalBudget: 1,
+
                                budgetName: '',
                                note: ''
+
                             ),
                       );
                     },
@@ -179,7 +182,8 @@ class _BudgetScreenState extends State<BudgetScreen> {
         child: Center(
           child: ElevatedButton(
             onPressed: () {
-              // Edit budget logic
+              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => EditBudgetScreen()));
+
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.tertiary,

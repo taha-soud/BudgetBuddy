@@ -103,7 +103,7 @@ class _EditBudgetScreenState extends State<EditBudgetScreen> {
       appBar: AppBar(
         leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()))
+            onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const BudgetScreen()))
         ),
         title: const Text("Edit Budget", style: TextStyle(color: Colors.white)),
         centerTitle: true,
