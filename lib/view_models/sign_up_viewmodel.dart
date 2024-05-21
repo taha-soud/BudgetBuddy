@@ -25,7 +25,6 @@ class SignUpViewModel {
       final User? user = userCredential.user;
 
       if (user != null) {
-        // User signed in successfully
         String uid = user.uid;
         String email = user.email ?? '';
         String username = user.displayName ?? '';

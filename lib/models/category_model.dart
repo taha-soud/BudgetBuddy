@@ -25,11 +25,13 @@ class Category {
 
   factory Category.fromJson(Map<String, dynamic> json) {
     return Category(
-      id: json['id'],
-      userId: json['userId'],
-      name: json['name'],
-      type: json['type'],
-      icon: json['icon'],
+
+      id: json['id'] ?? '',
+      userId: json['userId'] ?? '',
+      name: json['name'] ?? '',
+      type: json['type'] ?? '',
+      icon: json['icon'] ?? 'icon', // Provide a default iconString
+
     );
   }
 }
