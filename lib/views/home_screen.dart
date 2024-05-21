@@ -1,10 +1,10 @@
+import 'package:budget_buddy/views/report_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../res/custom_color.dart';
-import '../res/pie.dart';
 import 'bottom_bar.dart';
-import 'dart:math' as Math;
+import '../view_models/home_viewmodel.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,6 +15,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<Map<String, double>> _totalSpentByCategory;
+  double _totalSpend = 0.0;
+
+  final HomeViewModel _viewModel = HomeViewModel();
 
   @override
   void initState() {
@@ -22,19 +25,15 @@ class _HomeScreenState extends State<HomeScreen> {
     _fetchData();
   }
 
-  Future<void> _fetchData() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final userId = user.uid;
-      setState(() {
-        _totalSpentByCategory = calculateTotalSpentByCategory(userId);
+  void _fetchData() {
+    setState(() {
+      _totalSpentByCategory = _viewModel.calculateTotalSpentByCategory();
+      _totalSpentByCategory.then((data) {
+        setState(() {
+          _totalSpend = data.values.fold(0.0, (sum, value) => sum + value);
+        });
       });
-    } else {
-      // If the user is not logged in, provide an empty map
-      setState(() {
-        _totalSpentByCategory = Future.value({});
-      });
-    }
+    });
   }
 
   @override
@@ -45,76 +44,172 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: AppColors.primary,
         appBar: AppBar(
           backgroundColor: AppColors.primary,
-          title: const Text('BudgetBuddy', style: TextStyle(color: Colors.white)),
+          title: const Text('BudgetBuddy', style: TextStyle(color: AppColors.secondary)),
           centerTitle: true,
           actions: <Widget>[
             IconButton(
-              icon: const Icon(Icons.notifications, color: Colors.white),
+              icon: const Icon(Icons.notifications, color: AppColors.secondary),
               onPressed: () {
                 // Action when notification icon is pressed
               },
             )
           ],
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Spending by Category',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const Divider(
-                  color: Colors.white,
-                  thickness: 2.0,
-                ),
-                FutureBuilder<Map<String, double>>(
-                  future: _totalSpentByCategory,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}', style: TextStyle(color: Colors.white)));
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(child: Text('No data available', style: TextStyle(color: Colors.white)));
-                    } else {
-                      final data = snapshot.data!;
-                      final List<PieChartSectionData> sections = data.entries.map((entry) {
-                        return PieChartSectionData(
-                          color: getRandomColor(),
-                          value: entry.value,
-                          title: '${entry.key}: \$${entry.value.toStringAsFixed(2)}',
-                          radius: 50,
-                          titleStyle: const TextStyle(color: Colors.black, fontSize: 12),
-                        );
-                      }).toList();
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SingleChildScrollView(
+              child: FutureBuilder<Map<String, double>>(
+                future: _totalSpentByCategory,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.white)));
+                  } else {
+                    final data = snapshot.data ?? {};
+                    final hasData = data.isNotEmpty;
+                    final List<PieChartSectionData> sections = hasData
+                        ? data.entries.map((entry) {
+                      return PieChartSectionData(
+                        color: getCategoryColor(entry.key),
+                        value: entry.value,
+                        title: entry.value.toStringAsFixed(2),
+                        radius: 40,
+                        titleStyle: const TextStyle(color: AppColors.secondary, fontSize: 12),
+                      );
+                    }).toList()
+                        : [
+                      PieChartSectionData(
+                        color: Colors.grey,
+                        value: 1,
+                        title: '',
+                        radius: 40,
+                      )
+                    ];
 
-                      return SizedBox(
-                        height: 400.0,
-                        child: PieChart(
-                          PieChartData(
-                            sections: sections,
-                            centerSpaceRadius: 40,
-                            sectionsSpace: 2,
-                            borderData: FlBorderData(show: false),
-                            pieTouchData: PieTouchData(
-                              touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                                // Handle touch events if needed
-                              },
+                    return Stack(
+                      children: [
+                        Card(
+                          color: AppColors.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            side: const BorderSide(color: AppColors.colorIcon, width: 3),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Expanded(
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      SizedBox(
+                                        height: 200.0,
+                                        child: PieChart(
+                                          PieChartData(
+                                            sections: sections,
+                                            centerSpaceRadius: 40,
+                                            sectionsSpace: 2,
+                                            borderData: FlBorderData(show: false),
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned.fill(
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            const Text(
+                                              "You've spent",
+                                              style: TextStyle(
+                                                color: AppColors.secondary,
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              _totalSpend.toStringAsFixed(2),
+                                              style: const TextStyle(
+                                                color: AppColors.secondary,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 40),
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: hasData
+                                        ? data.entries.map((entry) {
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 7.0),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Container(
+                                              width: 10,
+                                              height: 10,
+                                              color: getCategoryColor(entry.key),
+                                            ),
+                                            const SizedBox(width: 5),
+                                            Text(
+                                              entry.key,
+                                              style: const TextStyle(color: AppColors.secondary),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }).toList()
+                                        : [
+                                      const Padding(
+                                        padding: EdgeInsets.symmetric(vertical: 7.0),
+                                        child: Text(
+                                          'No spending data available',
+                                          style: TextStyle(color: AppColors.secondary),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                      );
-                    }
-                  },
-                ),
-              ],
+                        Positioned(
+                          top: 9,
+                          right: 11,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const ReportScreen()
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: AppColors.secondary, backgroundColor: AppColors.tertiary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(40),
+                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                            ),
+                            child: const Text('See Report'),
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                },
+              ),
             ),
           ),
         ),
@@ -122,7 +217,18 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Color getRandomColor() {
-    return Color((Math.Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0);
+  Color getCategoryColor(String category) {
+    switch (category) {
+      case 'Lifestyle':
+        return Colors.blue;
+      case 'Transportation':
+        return Colors.green;
+      case 'Food and Drink':
+        return Colors.orange;
+      case 'My Categories':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
   }
 }
