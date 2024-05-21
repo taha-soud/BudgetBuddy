@@ -50,7 +50,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                         children: [
                           IconButton(
                             onPressed: () => viewModel.navigateBack(context),
-                            icon: Icon(Icons.arrow_back),
+                            icon: const Icon(Icons.arrow_back),
                             color: Colors.white,
                             iconSize: 35,
                           ),
@@ -58,14 +58,14 @@ class _BudgetScreenState extends State<BudgetScreen> {
                             child: Center(
                               child: Text(
                                 viewModel.months[viewModel.currentMonthIndex],
-                                style: TextStyle(
+                                style: const TextStyle(
                                     color: Colors.white, fontSize: 28),
                               ),
                             ),
                           ),
                           IconButton(
                             onPressed: () => viewModel.navigateForward(context),
-                            icon: Icon(Icons.arrow_forward),
+                            icon: const Icon(Icons.arrow_forward),
                             color: Colors.white,
                             iconSize: 35,
                           ),
@@ -85,8 +85,8 @@ class _BudgetScreenState extends State<BudgetScreen> {
                               toDate: DateTime.now(),
                               totalRemaining: 1,
                               totalBudget: 1,
-                              // budgetName: '',
-                              // note: ''
+                               budgetName: '',
+                               note: ''
                             ),
                       );
                     },
@@ -112,9 +112,9 @@ class _BudgetScreenState extends State<BudgetScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          margin: EdgeInsets.all(16),
+          margin: const EdgeInsets.all(16),
           child: Padding(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -126,18 +126,18 @@ class _BudgetScreenState extends State<BudgetScreen> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: Color.fromARGB(255, 208, 208, 208),
+                            color: const Color.fromARGB(255, 208, 208, 208),
                             width: 2,
                           ),
                         ),
                         child: Padding(
                           padding:
-                              EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           child: Consumer<BudgetViewModel>(
                             builder: (_, viewModel, __) {
                               return Text(
                                 '${viewModel.months[viewModel.currentMonthIndex]} Budget',
-                                style: TextStyle(
+                                style: const TextStyle(
                                     fontSize: 20, fontWeight: FontWeight.bold),
                               );
                             },
@@ -145,7 +145,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
@@ -156,18 +156,18 @@ class _BudgetScreenState extends State<BudgetScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 LinearProgressIndicator(
                   value: budget.totalRemaining / budget.totalBudget,
                   backgroundColor: Colors.grey[300],
                   minHeight: 10,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Text(
                   '\$${budget.totalRemaining.toStringAsFixed(2)} of \$${budget.totalBudget.toStringAsFixed(2)}',
-                  style: TextStyle(fontSize: 24, color: Colors.grey),
+                  style: const TextStyle(fontSize: 24, color: Colors.grey),
                 ),
               ],
             ),
@@ -183,9 +183,9 @@ class _BudgetScreenState extends State<BudgetScreen> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.tertiary,
-              fixedSize: Size(300, 70),
+              fixedSize: const Size(300, 70),
             ),
-            child: Text('Edit Budget',
+            child: const Text('Edit Budget',
                 style: TextStyle(color: Colors.white), textScaleFactor: 1.5),
           ),
         ),

@@ -1,4 +1,5 @@
 
+import 'package:budget_buddy/services/budget_provider.dart';
 import 'package:budget_buddy/view_models/add_budget_viewmodel.dart';
 import 'package:budget_buddy/views/splash_screen.dart';
 import 'package:flutter/material.dart';
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.teal,
         ),
               home: const SplashScreen(),
-
+      )
     );
   }
 }
