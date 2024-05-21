@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/category_model.dart';
 import '../res/custom_color.dart';
 import '../services/category_service.dart';
@@ -18,6 +19,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+
     return Scaffold(
       backgroundColor: AppColors.primary,
       appBar: AppBar(
@@ -27,10 +30,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.secondary),
           onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const ExpenseScreen(category: null)),
-            );
+            Navigator.pop(context);
           },
         ),
         actions: <Widget>[
@@ -52,8 +52,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: List.generate(categoryTypes.length, (index) {
               final String categoryType = categoryTypes[index];
+              final bool isMyCategories = categoryType == 'My Categories';
+              final String? userId = isMyCategories ? currentUser?.uid : null;
+
               return FutureBuilder<List<Category>>(
-                future: CategoryService().getCategoriesByType(categoryType),
+                future: CategoryService().getCategoriesByType(categoryType, userId: userId),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
@@ -94,12 +97,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                             final IconData iconData = getIconData(category.icon);
                             return GestureDetector(
                               onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ExpenseScreen(category: category),
-                                  ),
-                                );
+                                Navigator.pop(context,category);
                               },
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,

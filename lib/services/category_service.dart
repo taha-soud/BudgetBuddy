@@ -20,14 +20,21 @@ class CategoryService {
     return querySnapshot.docs.map((doc) => Category.fromJson(doc.data() as Map<String, dynamic>)).toList();
   }
 
-  Future<List<Category>> getCategoriesByType(String type) async {
-    final querySnapshot = await _categoriesCollection.where('type', isEqualTo: type).get();
+
+  Future<List<Category>> getCategoriesByType(String type, {String? userId}) async {
+    Query query = _categoriesCollection.where('type', isEqualTo: type);
+
+    if (userId != null) {
+      query = query.where('userId', isEqualTo: userId);
+    }
+
+    final QuerySnapshot querySnapshot = await query.get();
     return querySnapshot.docs.map((doc) => Category.fromJson(doc.data() as Map<String, dynamic>)).toList();
   }
 
   Future<void> addCategory(Category category) async {
     try {
-      await _categoriesCollection.add(category.toJson());
+      await _categoriesCollection.doc(category.id).set(category.toJson());
     } catch (e) {
       throw Exception('Failed to add category: $e');
     }

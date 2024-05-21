@@ -19,7 +19,7 @@ class Category {
       'userId': userId,
       'name': name,
       'type': type,
-      'iconString': icon,
+      'icon': icon,
     };
   }
 
