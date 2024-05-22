@@ -1,24 +1,41 @@
-import 'package:budget_buddy/view_models/transactionSubCard_viewmodel.dart';
+
+import 'package:budget_buddy/views/report_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:fl_chart/fl_chart.dart';
 import '../res/custom_color.dart';
 import 'bottom_bar.dart';
+import '../view_models/home_viewmodel.dart';
+
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late Future<void> _fetchTransactionFuture;
+  late Future<Map<String, double>> _totalSpentByCategory;
+  double _totalSpend = 0.0;
 
+  final HomeViewModel _viewModel = HomeViewModel();
   @override
   void initState() {
     super.initState();
-    final viewModel = Provider.of<TransactionViewModel>(context, listen: false);
-    _fetchTransactionFuture = viewModel.fetchLastTransaction();
+    _fetchData();
+  }
+
+  void _fetchData() {
+    setState(() {
+      _totalSpentByCategory = _viewModel.calculateTotalSpentByCategory();
+      _totalSpentByCategory.then((data) {
+        setState(() {
+          _totalSpend = data.values.fold(0.0, (sum, value) => sum + value);
+        });
+      });
+    });
   }
 
   @override
@@ -29,117 +46,194 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: AppColors.primary,
         appBar: AppBar(
           backgroundColor: AppColors.primary,
-          title: const Text(
-            'BudgetBuddy',
-            style: TextStyle(color: Colors.white),
-          ),
+
+          title: const Text('BudgetBuddy', style: TextStyle(color: AppColors.secondary)),
           centerTitle: true,
           actions: <Widget>[
             IconButton(
-              icon: const Icon(Icons.notifications, color: Colors.white),
+              icon: const Icon(Icons.notifications, color: AppColors.secondary),
               onPressed: () {
                 // Action when notification icon is pressed
               },
             )
           ],
         ),
-        body: Container(
-          child: Container(
-            width: MediaQuery.of(context).size.width,
-            height: 500,
-            color: AppColors.primary,
-            child: Card(
-              color: AppColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-                side: const BorderSide(width: 2, color: AppColors.colorIcon),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: Column(
-                  children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Container(
-                          margin: const EdgeInsets.only(left: 10),
-                          child: const Text(
-                            'Income',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.secondary,
+
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SingleChildScrollView(
+              child: FutureBuilder<Map<String, double>>(
+                future: _totalSpentByCategory,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.white)));
+                  } else {
+                    final data = snapshot.data ?? {};
+                    final hasData = data.isNotEmpty;
+                    final List<PieChartSectionData> sections = hasData
+                        ? data.entries.map((entry) {
+                      return PieChartSectionData(
+                        color: getCategoryColor(entry.key),
+                        value: entry.value,
+                        title: entry.value.toStringAsFixed(2),
+                        radius: 40,
+                        titleStyle: const TextStyle(color: AppColors.secondary, fontSize: 12),
+                      );
+                    }).toList()
+                        : [
+                      PieChartSectionData(
+                        color: Colors.grey,
+                        value: 1,
+                        title: '',
+                        radius: 40,
+                      )
+                    ];
+
+                    return Stack(
+                      children: [
+                        Card(
+                          color: AppColors.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            side: const BorderSide(color: AppColors.colorIcon, width: 3),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Expanded(
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      SizedBox(
+                                        height: 200.0,
+                                        child: PieChart(
+                                          PieChartData(
+                                            sections: sections,
+                                            centerSpaceRadius: 40,
+                                            sectionsSpace: 2,
+                                            borderData: FlBorderData(show: false),
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned.fill(
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            const Text(
+                                              "You've spent",
+                                              style: TextStyle(
+                                                color: AppColors.secondary,
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              _totalSpend.toStringAsFixed(2),
+                                              style: const TextStyle(
+                                                color: AppColors.secondary,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 40),
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: hasData
+                                        ? data.entries.map((entry) {
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 7.0),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Container(
+                                              width: 10,
+                                              height: 10,
+                                              color: getCategoryColor(entry.key),
+                                            ),
+                                            const SizedBox(width: 5),
+                                            Text(
+                                              entry.key,
+                                              style: const TextStyle(color: AppColors.secondary),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }).toList()
+                                        : [
+                                      const Padding(
+                                        padding: EdgeInsets.symmetric(vertical: 7.0),
+                                        child: Text(
+                                          'No spending data available',
+                                          style: TextStyle(color: AppColors.secondary),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                        Expanded(
+                        Positioned(
+                          top: 9,
+                          right: 11,
                           child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 5,
-                                vertical: 2,
-                              ),
-                              fixedSize: const Size(60, 25),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5)),
-                              ),
-                              backgroundColor: AppColors.tertiary,
-                            ),
                             onPressed: () {
-                              final viewModel =
-                                  Provider.of<TransactionViewModel>(context,
-                                      listen: false);
-                              viewModel.fetchLastTransaction();
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const ReportScreen()
+                                ),
+                              );
                             },
-                            child: const Text(
-                              'See All',
-                              style: TextStyle(
-                                color: AppColors.secondary,
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: AppColors.secondary, backgroundColor: AppColors.tertiary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(40),
                               ),
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
                             ),
+                            child: const Text('See Report'),
                           ),
                         ),
                       ],
-                    ),
-                    Consumer<TransactionViewModel>(
-                      builder: (context, model, child) {
-                        // if (model.title.isEmpty) {
-                        //   return const CircularProgressIndicator();
-                        // } else {
-                        return TransactionSubCard(
-                          title: model.title,
-                          description: model.description,
-                          amount: model.amount,
-                          time: model.time,
-                          icon: const Icon(
-                            Icons.account_balance_wallet,
-                            size: 60,
-                            color: AppColors.secondary,
-                          ),
-                        );
-                        // }
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    // const TransactionSubCard(
-                    //   title: 'Groceries',
-                    //   description: 'Weekly grocery shopping',
-                    //   amount: '- \$30',
-                    //   time: '10:00 AM',
-                    //   icon: Icon(
-                    //     Icons.account_balance_wallet,
-                    //     size: 60,
-                    //     color: AppColors.secondary,
-                    //   ),
-                    // ),
-                  ],
-                ),
+                    );
+                  }
+                },
               ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  Color getCategoryColor(String category) {
+    switch (category) {
+      case 'Lifestyle':
+        return Colors.blue;
+      case 'Transportation':
+        return Colors.green;
+      case 'Food and Drink':
+        return Colors.orange;
+      case 'My Categories':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
   }
 }
 
