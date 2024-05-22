@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../models/transaction_model.dart';
 import '../models/category_model.dart';
 
-class HomeViewModel {
+class TransactionViewmodel {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 

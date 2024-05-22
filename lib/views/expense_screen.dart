@@ -60,7 +60,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
               style: const TextStyle(fontSize: 48.0, fontWeight: FontWeight.bold, color: Colors.white),
               decoration: InputDecoration(
                 border: InputBorder.none,
-                hintText: '\$0.0',
+                hintText: '₪0.0',
                 hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
               ),
             ),

@@ -21,7 +21,6 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => UserViewModel()),
         ChangeNotifierProvider(create: (_) => AddBudgetViewModel()),
-        ChangeNotifierProvider(create: (_) => TransactionViewModel()),
       ],
       child: MyApp(),
     ),
@@ -40,7 +39,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             primarySwatch: Colors.teal,
           ),
-          home: const HomeScreen(),
+          home: const SplashScreen(),
         ));
   }
 }

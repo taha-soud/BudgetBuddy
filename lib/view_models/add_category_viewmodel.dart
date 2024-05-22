@@ -1,3 +1,4 @@
+import 'package:budget_buddy/views/category_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +39,8 @@ class AddCategoryViewModel extends ChangeNotifier {
 
 
       await CategoryService().addCategory(newCategory);
-      Navigator.pop(context);
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> CategoryScreen()));
+
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No user is currently logged in')),
