@@ -1,3 +1,4 @@
+
 import 'package:budget_buddy/views/report_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -6,10 +7,12 @@ import 'bottom_bar.dart';
 import '../view_models/home_viewmodel.dart';
 
 
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+
   _HomeScreenState createState() => _HomeScreenState();
 }
 
@@ -18,7 +21,6 @@ class _HomeScreenState extends State<HomeScreen> {
   double _totalSpend = 0.0;
 
   final HomeViewModel _viewModel = HomeViewModel();
-
   @override
   void initState() {
     super.initState();
@@ -44,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: AppColors.primary,
         appBar: AppBar(
           backgroundColor: AppColors.primary,
+
           title: const Text('BudgetBuddy', style: TextStyle(color: AppColors.secondary)),
           centerTitle: true,
           actions: <Widget>[
@@ -55,6 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
             )
           ],
         ),
+
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -230,5 +234,95 @@ class _HomeScreenState extends State<HomeScreen> {
       default:
         return Colors.grey;
     }
+  }
+}
+
+class TransactionSubCard extends StatelessWidget {
+  final String title;
+  final String description;
+  final String amount;
+  final String time;
+  final Icon icon;
+
+  const TransactionSubCard({
+    super.key,
+    required this.title,
+    required this.description,
+    required this.amount,
+    required this.time,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        Container(
+          margin: const EdgeInsets.only(left: 10),
+          child: icon,
+        ),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    color: AppColors.secondary,
+                  ),
+                ),
+                Text(
+                  description,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: AppColors.secondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: Text(
+                      amount,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: AppColors.secondary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: Text(
+                      time,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: AppColors.secondary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }
