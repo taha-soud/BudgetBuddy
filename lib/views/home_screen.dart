@@ -1,7 +1,3 @@
-import 'package:budget_buddy/view_models/transactionSubCard_viewmodel.dart';
-import 'package:budget_buddy/views/expense_screen.dart';
-import 'package:budget_buddy/views/report_screen.dart';
-import 'package:budget_buddy/views/transaction_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
@@ -9,13 +5,15 @@ import '../models/category_model.dart';
 import '../models/transaction_model.dart';
 import '../res/custom_color.dart';
 import '../utils/icons.dart';
-import 'bottom_bar.dart';
 import '../view_models/home_viewmodel.dart';
-import 'package:budget_buddy/view_models/transactionSubCard_viewmodel.dart';
-
+import '../view_models/transactionSubCard_viewmodel.dart';
+import 'bottom_bar.dart';
+import 'expense_screen.dart';
+import 'report_screen.dart';
+import 'transaction_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -24,7 +22,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late Future<Map<String, double>> _totalSpentByCategory;
   late Future<List<Transactions>> _lastTwoTransactions;
-  double _totalSpend = 0.0;
+  late Future<Map<String, double>> _budgetOverview;
   final HomeViewModel _viewModel = HomeViewModel();
   final TransactionViewmodel _viewModels = TransactionViewmodel();
 
@@ -38,11 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _totalSpentByCategory = _viewModel.calculateTotalSpentByCategory();
       _lastTwoTransactions = _viewModels.fetchLastTwoTransactions();
-      _totalSpentByCategory.then((data) {
-        setState(() {
-          _totalSpend = data.values.fold(0.0, (sum, value) => sum + value);
-        });
-      });
+      _budgetOverview = _viewModel.fetchBudgetOverview();
     });
   }
 
@@ -54,7 +48,10 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: AppColors.primary,
         appBar: AppBar(
           backgroundColor: AppColors.primary,
-          title: const Text('BudgetBuddy', style: TextStyle(color: AppColors.secondary)),
+          title: const Text(
+            'BudgetBuddy',
+            style: TextStyle(color: AppColors.secondary),
+          ),
           centerTitle: true,
           actions: <Widget>[
             IconButton(
@@ -65,155 +62,195 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  FutureBuilder<Map<String, double>>(
-                    future: _totalSpentByCategory,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.white)));
-                      } else {
-                        final data = snapshot.data ?? {};
-                        final hasData = data.isNotEmpty;
-                        final sections = _buildPieChartSections(data);
-
-                        return Stack(
-                          children: [
-                            Card(
-                              color: AppColors.primary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15),
-                                side: const BorderSide(color: AppColors.colorIcon, width: 3),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(20.0),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Expanded(
-                                      child: Stack(
-                                        alignment: Alignment.center,
-                                        children: [
-                                          SizedBox(
-                                            height: 200.0,
-                                            child: PieChart(
-                                              PieChartData(
-                                                sections: sections,
-                                                centerSpaceRadius: 40,
-                                                sectionsSpace: 2,
-                                                borderData: FlBorderData(show: false),
-                                              ),
-                                            ),
-                                          ),
-                                          Positioned.fill(
-                                            child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                const Text(
-                                                  "You've spent",
-                                                  style: TextStyle(
-                                                    color: AppColors.secondary,
-                                                    fontSize: 10,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  _totalSpend.toStringAsFixed(2),
-                                                  style: const TextStyle(
-                                                    color: AppColors.secondary,
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 40),
-                                    Expanded(
-                                      child: _buildCategoryList(data),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              top: 9,
-                              right: 11,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => const ReportScreen()),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: AppColors.secondary,
-                                  backgroundColor: AppColors.tertiary,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(40),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                                ),
-                                child: const Text('See Report'),
-                              ),
-                            ),
-                          ],
-                        );
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  FutureBuilder<List<Transactions>>(
-                    future: _lastTwoTransactions,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return Center(
-                          child: Text(
-                            'Error loading transactions: ${snapshot.error}',
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        );
-                      } else {
-                        final transactions = snapshot.data ?? [];
-                        return _buildTransactionCard(transactions);
-                      }
-                    },
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> ExpenseScreen()));
-
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: AppColors.tertiary,
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              FutureBuilder<Map<String, double>>(
+                future: _budgetOverview,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(
+                        child: Text('Error: ${snapshot.error}',
+                            style: const TextStyle(color: Colors.white)));
+                  } else {
+                    final data = snapshot.data ?? {'Income': 0.0, 'Outcome': 0.0, 'Left': 0.0};
+                    return SizedBox(
+                      height: 90,
+                      child: Card(
+                        color: AppColors.primary,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(40),
+                          borderRadius: BorderRadius.circular(15),
+                          side: const BorderSide(color: AppColors.tertiary, width: 3),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              _buildBudgetInfo('Income', data['Income']!, Colors.white),
+                              _buildBudgetInfo('Outcome', data['Outcome']!, Colors.white),
+                              _buildBudgetInfo('Left', data['Left']!, Colors.white),
+                            ],
+                          ),
+                        ),
                       ),
-                      child: const Text('Add Expense',style: TextStyle(color: Colors.white, fontSize: 23))
-                    ),
-                  ),
-                ],
+                    );
+                  }
+                },
               ),
-            ),
+              const SizedBox(height: 20),
+              FutureBuilder<Map<String, double>>(
+                future: _totalSpentByCategory,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(
+                        child: Text('Error: ${snapshot.error}',
+                            style: const TextStyle(color: Colors.white)));
+                  } else {
+                    final data = snapshot.data ?? {};
+                    final sections = _buildPieChartSections(data);
+
+                    return Stack(
+                      children: [
+                        Card(
+                          color: AppColors.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            side: const BorderSide(
+                                color: AppColors.tertiary, width: 3),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  height: 150.0,
+                                  width: 150.0,
+                                  child: PieChart(
+                                    PieChartData(
+                                      sections: sections,
+                                      centerSpaceRadius: 30,
+                                      sectionsSpace: 2,
+                                      borderData: FlBorderData(show: false),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: _buildCategoryList(data),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                    const ReportScreen()),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: AppColors.secondary,
+                              backgroundColor: AppColors.tertiary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(40),
+                              ),
+                              padding:
+                              const EdgeInsets.symmetric(horizontal: 12),
+                            ),
+                            child: const Text('See Report',
+                                style: TextStyle(
+                                    color: AppColors.secondary, fontSize: 12)),
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                },
+              ),
+              const SizedBox(height: 20),
+              FutureBuilder<List<Transactions>>(
+                future: _lastTwoTransactions,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(
+                      child: Text(
+                        'Error loading transactions: ${snapshot.error}',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    );
+                  } else {
+                    final transactions = snapshot.data ?? [];
+                    return SizedBox(
+                      height: 200, // Adjusted height
+                      child: _buildTransactionCard(transactions),
+                    );
+                  }
+                },
+              ),
+              const SizedBox(height: 20),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ExpenseScreen()));
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: AppColors.tertiary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(40),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 40, vertical: 13),
+                  ),
+                  child: const Text(
+                    'Add Expense',
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildBudgetInfo(String title, double amount, Color color) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+              color: AppColors.secondary,
+              fontSize: 16,
+              fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          '\$$amount',
+          style: TextStyle(color: color, fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+      ],
     );
   }
 
@@ -224,7 +261,7 @@ class _HomeScreenState extends State<HomeScreen> {
           color: Colors.grey,
           value: 1,
           title: '',
-          radius: 40,
+          radius: 30,
         )
       ];
     }
@@ -234,7 +271,7 @@ class _HomeScreenState extends State<HomeScreen> {
         color: getCategoryColor(entry.key),
         value: entry.value,
         title: entry.value.toStringAsFixed(2),
-        radius: 40,
+        radius: 30,
         titleStyle: const TextStyle(color: AppColors.secondary, fontSize: 12),
       );
     }).toList();
@@ -282,10 +319,10 @@ class _HomeScreenState extends State<HomeScreen> {
       color: AppColors.primary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
-        side: const BorderSide(color: AppColors.colorIcon, width: 3),
+        side: const BorderSide(color: AppColors.tertiary, width: 3),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -295,9 +332,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 const Text(
                   'Recent Transactions',
                   style: TextStyle(
-                      color: AppColors.secondary,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold),
+                    color: AppColors.secondary,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -312,11 +350,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(40),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 17),
                   ),
                   child: const Text(
                     'See All',
-                    style: TextStyle(color: AppColors.secondary, fontSize: 16),
+                    style: TextStyle(color: AppColors.secondary, fontSize: 12),
                   ),
                 ),
               ],
@@ -327,7 +365,8 @@ class _HomeScreenState extends State<HomeScreen> {
               return FutureBuilder<Category>(
                 future: _viewModels.fetchCategoryById(transaction.categoryId),
                 builder: (context, categorySnapshot) {
-                  if (categorySnapshot.connectionState == ConnectionState.waiting) {
+                  if (categorySnapshot.connectionState ==
+                      ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (categorySnapshot.hasError) {
                     return Center(
@@ -342,13 +381,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     final categoryIcon = getIconData(category.icon);
 
                     return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 7.0),
+                      padding: const EdgeInsets.symmetric(vertical: 6.0),
                       child: Row(
                         children: [
                           Icon(
                             categoryIcon,
                             color: AppColors.secondary,
-                            size: 40,
+                            size: 30,
                           ),
                           const SizedBox(width: 10),
                           Expanded(
@@ -358,11 +397,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Text(categoryName,
                                     style: const TextStyle(
                                         color: AppColors.secondary,
-                                        fontSize: 20)),
+                                        fontSize: 16)),
                                 Text(transaction.description,
                                     style: const TextStyle(
                                         color: AppColors.secondary,
-                                        fontSize: 16)),
+                                        fontSize: 12)),
                               ],
                             ),
                           ),
@@ -370,17 +409,18 @@ class _HomeScreenState extends State<HomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                  '\$${transaction.amount.toStringAsFixed(2)}',
-                                  style: const TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold)),
+                                '-₪${transaction.amount.toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold),
+                              ),
                               Text(
-                                  DateFormat('kk:mm')
-                                      .format(transaction.date),
-                                  style: const TextStyle(
-                                      color: AppColors.secondary,
-                                      fontSize: 16)),
+                                DateFormat('kk:mm')
+                                    .format(transaction.date),
+                                style: const TextStyle(
+                                    color: AppColors.secondary, fontSize: 14),
+                              ),
                             ],
                           ),
                         ],
@@ -404,8 +444,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-
 
   Color getCategoryColor(String category) {
     switch (category) {
