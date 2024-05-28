@@ -1,4 +1,5 @@
 
+import 'package:budget_buddy/views/notification_screen.dart';
 import 'package:budget_buddy/views/report_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -53,7 +54,11 @@ class _HomeScreenState extends State<HomeScreen> {
             IconButton(
               icon: const Icon(Icons.notifications, color: AppColors.secondary),
               onPressed: () {
-                // Action when notification icon is pressed
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const NotificationScreen()),
+                );
               },
             )
           ],
@@ -234,95 +239,5 @@ class _HomeScreenState extends State<HomeScreen> {
       default:
         return Colors.grey;
     }
-  }
-}
-
-class TransactionSubCard extends StatelessWidget {
-  final String title;
-  final String description;
-  final String amount;
-  final String time;
-  final Icon icon;
-
-  const TransactionSubCard({
-    super.key,
-    required this.title,
-    required this.description,
-    required this.amount,
-    required this.time,
-    required this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        Container(
-          margin: const EdgeInsets.only(left: 10),
-          child: icon,
-        ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.only(left: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    color: AppColors.secondary,
-                  ),
-                ),
-                Text(
-                  description,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: AppColors.secondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(right: 10),
-                    child: Text(
-                      amount,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        color: AppColors.secondary,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(right: 10),
-                    child: Text(
-                      time,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        color: AppColors.secondary,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
   }
 }
