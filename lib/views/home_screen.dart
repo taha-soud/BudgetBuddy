@@ -1,3 +1,7 @@
+
+
+import 'package:budget_buddy/views/notification_screen.dart';
+import 'package:budget_buddy/views/report_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
@@ -57,7 +61,11 @@ class _HomeScreenState extends State<HomeScreen> {
             IconButton(
               icon: const Icon(Icons.notifications, color: AppColors.secondary),
               onPressed: () {
-                // Action when notification icon is pressed
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const NotificationScreen()),
+                );
               },
             ),
           ],
@@ -253,6 +261,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
     );
   }
+
 
   List<PieChartSectionData> _buildPieChartSections(Map<String, double> data) {
     if (data.isEmpty) {
@@ -459,4 +468,5 @@ class _HomeScreenState extends State<HomeScreen> {
         return Colors.grey;
     }
   }
+
 }
