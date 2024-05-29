@@ -152,7 +152,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        'Remaining \$${budget.totalRemaining.toStringAsFixed(2)}',
+                        'Remaining ₪${budget.totalRemaining.toStringAsFixed(2)}',
                         style: const TextStyle(
                             fontSize: 35, fontWeight: FontWeight.bold),
                       ),
@@ -169,7 +169,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  '\$${budget.totalRemaining.toStringAsFixed(2)} of \$${budget.totalBudget.toStringAsFixed(2)}',
+                  '₪${budget.totalRemaining.toStringAsFixed(2)} of ₪${budget.totalBudget.toStringAsFixed(2)}',
                   style: const TextStyle(fontSize: 24, color: Colors.grey),
                 ),
               ],
