@@ -32,6 +32,7 @@ class AddCategoryScreen extends StatelessWidget {
                     if (viewModel.validateForm()) {
                       viewModel.saveForm();
                       viewModel.saveCategory(context);
+
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Please enter all fields')),

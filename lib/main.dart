@@ -31,6 +31,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => AddBudgetViewModel()),
         ChangeNotifierProvider(create: (_) => BudgetProvider()),
         ChangeNotifierProvider(create: (_) => NotificationViewModel(notificationService)),
+
       ],
       child: const MyApp(),
     ),
@@ -50,5 +51,6 @@ class MyApp extends StatelessWidget {
       ),
       home: const SplashScreen(),
     );
+
   }
 }
