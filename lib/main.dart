@@ -5,6 +5,7 @@ import 'package:budget_buddy/view_models/update_settings_viewmodel.dart';
 import 'package:budget_buddy/view_models/notification_view_model.dart';
 import 'package:budget_buddy/services/notifications_service.dart';
 import 'package:budget_buddy/views/splash_screen.dart';
+import 'package:budget_buddy/views/transaction_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';

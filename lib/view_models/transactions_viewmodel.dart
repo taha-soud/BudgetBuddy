@@ -25,18 +25,57 @@ class TransactionPageViewModel {
 
       for (var transactionDoc in transactionSnapshot.docs) {
         var transactionData = transactionDoc.data() as Map<String, dynamic>;
-        var categorySnapshot = await _firestore.collection('category').doc(transactionData['categoryId']).get();
+        var categorySnapshot = await _firestore
+            .collection('category')
+            .doc(transactionData['categoryId'])
+            .get();
         var categoryData = categorySnapshot.data() as Map<String, dynamic>?;
         if (categoryData != null) {
           transactionsWithCategories.add({
             'transaction': Transactions.fromJson(transactionData),
             'categoryName': categoryData['name'],
-            'categoryIcon': categoryData['icon']  // Icon name as string
+            'categoryIcon': categoryData['icon'] // Icon name as string
           });
         }
       }
 
       return transactionsWithCategories;
     });
+  }
+
+  Future<List<Map<String, dynamic>>> searchTransactions(String query) async {
+    List<Map<String, dynamic>> allTransactions =
+        await getAllTransactionsWithCategory().first;
+
+    List<Map<String, dynamic>> filteredTransactions =
+        allTransactions.where((transaction) {
+      var transactionData = transaction['transaction'] as Transactions;
+
+      // Check if the query matches the category name
+      bool matchesCategory =
+          transaction['categoryName']?.toLowerCase() == query.toLowerCase();
+
+      // Check if the query matches the amount
+      bool matchesAmount = false;
+      try {
+        double queryAmount = double.parse(query);
+        matchesAmount = transactionData.amount == queryAmount;
+      } catch (e) {
+        // Ignore if parsing fails, query is not an amount
+      }
+
+      // Check if the query matches the date
+      bool matchesDate = false;
+      try {
+        DateTime queryDate = DateTime.parse(query);
+        matchesDate = transactionData.date == queryDate;
+      } catch (e) {
+        // Ignore if parsing fails, query is not a date
+      }
+
+      return matchesCategory || matchesAmount || matchesDate;
+    }).toList();
+
+    return filteredTransactions;
   }
 }
