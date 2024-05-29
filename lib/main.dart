@@ -3,6 +3,7 @@ import 'package:budget_buddy/view_models/add_budget_viewmodel.dart';
 import 'package:budget_buddy/view_models/transactionSubCard_viewmodel.dart';
 import 'package:budget_buddy/view_models/update_settings_viewmodel.dart';
 import 'package:budget_buddy/views/splash_screen.dart';
+import 'package:budget_buddy/views/transaction_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -39,7 +40,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             primarySwatch: Colors.teal,
           ),
-          home: const SplashScreen(),
+          home: const TransactionScreen(),
         ));
   }
 }
