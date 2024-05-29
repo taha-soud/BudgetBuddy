@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import '../models/budget_model.dart';
@@ -13,10 +16,15 @@ class NotificationService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   NotificationService() {
-    _init();
+    init();
   }
 
-  void _init() async {
+  void init() async {
+
+    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
+    final InitializationSettings initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
+    await _localNotifications.initialize(initializationSettings);
+    print(tz.local);
     tz.initializeTimeZones();
     await requestPermissions();
     _initializeLocalNotifications();
@@ -34,11 +42,20 @@ class NotificationService {
 
     // Schedule daily reminder at 1:20 PM
     _scheduleDailyExpenseReminder();
-    // Schedule monthly reminder on the 29th
-    _scheduleMonthlyReminderOn29th();
+
+  Timer.periodic(const Duration(seconds: 120), (timer) {
+      _scheduleDailyMotivationReminder("Motivation Reminder","Small steps, big changes. Keep going!");
+
+    });
+
+    Timer.periodic(const Duration(seconds: 360), (timer) {
+      _scheduleDailyMotivationReminder("Motivation Reminder","Budgeting is making dreams possible!");
+
+    });
   }
 
   Future<void> requestPermissions() async {
+    _requestExactAlarmPermission();
     NotificationSettings settings = await _messaging.requestPermission(
       alert: true,
       announcement: false,
@@ -55,6 +72,14 @@ class NotificationService {
       print('User granted provisional permission');
     } else {
       print('User declined or has not accepted permission');
+    }
+  }
+
+  Future<void> _requestExactAlarmPermission() async {
+    if (await Permission.scheduleExactAlarm.request().isGranted) {
+      print("Exact alarm permission granted");
+    } else {
+      print("Exact alarm permission denied");
     }
   }
 
@@ -186,14 +211,16 @@ class NotificationService {
     );
   }
 
-  tz.TZDateTime _nextInstanceOfTenPM() {
+  tz.TZDateTime _nextInstanceOf29th() {
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
-    tz.TZDateTime scheduledDate = tz.TZDateTime(tz.local, now.year, now.month, now.day, 22);
+    tz.TZDateTime scheduledDate = tz.TZDateTime(tz.local, now.year, now.month, 29, 22);
     if (scheduledDate.isBefore(now)) {
-      scheduledDate = scheduledDate.add(const Duration(days: 1));
+      scheduledDate = tz.TZDateTime(tz.local, now.year, now.month + 1, 29, 22);
     }
     return scheduledDate;
   }
+
+
 
   void _scheduleMonthlyReminderOn29th() async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
@@ -220,11 +247,38 @@ class NotificationService {
     );
   }
 
-  tz.TZDateTime _nextInstanceOf29th() {
-    final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
-    tz.TZDateTime scheduledDate = tz.TZDateTime(tz.local, now.year, now.month, 29, 22);
+  void _scheduleDailyMotivationReminder(String title ,String body) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'daily_reminder_channel',
+      'Daily Reminder Notifications',
+      channelDescription: 'This channel is used for daily reminder notifications',
+      importance: Importance.max,
+      priority: Priority.high,
+      showWhen: true
+      ,
+    );    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+
+
+
+    final tz.TZDateTime scheduledDate = _nextInstanceOfTenPM();
+    print('Scheduling daily reminder at: $scheduledDate');
+
+    await _localNotifications.show(
+      3,
+      title,
+      body,
+      platformChannelSpecifics
+
+
+
+    );
+  }
+
+  tz.TZDateTime _nextInstanceOfTenPM() {
+    tz.TZDateTime now = tz.TZDateTime.now(tz.local);
+    tz.TZDateTime scheduledDate = tz.TZDateTime(tz.local, now.year, now.month, now.day, 18,57);
     if (scheduledDate.isBefore(now)) {
-      scheduledDate = tz.TZDateTime(tz.local, now.year, now.month + 1, 29, 22);
+      scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
     return scheduledDate;
   }

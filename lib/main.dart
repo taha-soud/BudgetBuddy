@@ -17,7 +17,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
   // Initialize time zone data
   tz.initializeTimeZones();
 
@@ -44,6 +43,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Budget Buddy',
       theme: ThemeData(
         primarySwatch: Colors.teal,
