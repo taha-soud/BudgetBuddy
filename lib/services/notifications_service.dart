@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -20,42 +19,36 @@ class NotificationService {
   }
 
   void init() async {
-
-    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
-    final InitializationSettings initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
-    await _localNotifications.initialize(initializationSettings);
-    print(tz.local);
+    await _initializeLocalNotifications();
     tz.initializeTimeZones();
+    tz.setLocalLocation(tz.local);
     await requestPermissions();
-    _initializeLocalNotifications();
-
-    try {
-      final token = await _messaging.getToken();
-      print("Firebase Messaging Token: $token");
-    } catch (e) {
-      print("Error fetching messaging token: $e");
-    }
+    await _fetchFirebaseMessagingToken();
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       _showNotification(message);
     });
 
-    // Schedule daily reminder at 1:20 PM
     _scheduleDailyExpenseReminder();
+    _scheduleRecurringMotivationReminders();
 
-  Timer.periodic(const Duration(seconds: 120), (timer) {
-      _scheduleDailyMotivationReminder("Motivation Reminder","Small steps, big changes. Keep going!");
-
+    Timer.periodic(const Duration(seconds: 30), (timer) {
+      print('Current time: ${tz.TZDateTime.now(tz.local)}');
     });
 
-    Timer.periodic(const Duration(seconds: 360), (timer) {
-      _scheduleDailyMotivationReminder("Motivation Reminder","Budgeting is making dreams possible!");
+    _testImmediateNotification();
 
-    });
+    _testImmediateScheduledNotification();
+  }
+
+  Future<void> _initializeLocalNotifications() async {
+    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const InitializationSettings initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
+    await _localNotifications.initialize(initializationSettings);
   }
 
   Future<void> requestPermissions() async {
-    _requestExactAlarmPermission();
+    await _requestExactAlarmPermission();
     NotificationSettings settings = await _messaging.requestPermission(
       alert: true,
       announcement: false,
@@ -83,13 +76,13 @@ class NotificationService {
     }
   }
 
-  void _initializeLocalNotifications() {
-    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-    );
-
-    _localNotifications.initialize(initializationSettings);
+  Future<void> _fetchFirebaseMessagingToken() async {
+    try {
+      final token = await _messaging.getToken();
+      print("Firebase Messaging Token: $token");
+    } catch (e) {
+      print("Error fetching messaging token: $e");
+    }
   }
 
   void _showNotification(RemoteMessage message) async {
@@ -113,7 +106,7 @@ class NotificationService {
         notificationTitle,
         notificationBody,
         platformChannelSpecifics,
-        payload: message.data.toString(), // Use payload to pass data
+        payload: message.data.toString(),
       );
     } catch (e) {
       print("Error showing notification: $e");
@@ -163,6 +156,7 @@ class NotificationService {
         platformChannelSpecifics,
         payload: 'item x',
       );
+      print('Local notification shown: $title - $body');
     } catch (e) {
       print("Error showing local notification: $e");
     }
@@ -181,6 +175,7 @@ class NotificationService {
 
     try {
       await _firestore.collection('notification').add(notification.toJson());
+      print('Notification stored: $title - $body');
     } catch (e) {
       print("Error storing notification: $e");
     }
@@ -199,16 +194,72 @@ class NotificationService {
     final tz.TZDateTime scheduledDate = _nextInstanceOfTenPM();
     print('Scheduling daily reminder at: $scheduledDate');
 
-    await _localNotifications.zonedSchedule(
-      0,
-      'Expense Reminder',
-      "Don't forget to log your expenses for today.",
-      scheduledDate,
-      platformChannelSpecifics,
-      androidAllowWhileIdle: true,
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: DateTimeComponents.time,
+    try {
+      await _localNotifications.zonedSchedule(
+        0,
+        'Expense Reminder',
+        "Don't forget to log your expenses for today.",
+        scheduledDate,
+        platformChannelSpecifics,
+        androidAllowWhileIdle: true,
+        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+      print('Daily reminder scheduled for: $scheduledDate');
+    } catch (e) {
+      print("Error scheduling daily reminder: $e");
+    }
+  }
+
+  void _scheduleRecurringMotivationReminders() {
+    Timer.periodic(const Duration(minutes: 2), (timer) {
+      _scheduleDailyMotivationReminder("Motivation Reminder", "Small steps, big changes. Keep going!");
+    });
+
+    Timer.periodic(const Duration(minutes: 6), (timer) {
+      _scheduleDailyMotivationReminder("Motivation Reminder", "Budgeting is making dreams possible!");
+    });
+  }
+
+  void _scheduleDailyMotivationReminder(String title, String body) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'daily_reminder_channel',
+      'Daily Reminder Notifications',
+      channelDescription: 'This channel is used for daily reminder notifications',
+      importance: Importance.max,
+      priority: Priority.high,
+      showWhen: true,
     );
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    final tz.TZDateTime scheduledDate = _nextInstanceOfTenPM();
+    print('Scheduling daily motivation reminder at: $scheduledDate');
+
+    try {
+      await _localNotifications.zonedSchedule(
+        3,
+        title,
+        body,
+        scheduledDate,
+        platformChannelSpecifics,
+        androidAllowWhileIdle: true,
+        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+      print('Daily motivation reminder scheduled for: $scheduledDate');
+    } catch (e) {
+      print("Error scheduling motivation notification: $e");
+    }
+  }
+
+  tz.TZDateTime _nextInstanceOfTenPM() {
+    tz.TZDateTime now = tz.TZDateTime.now(tz.local);
+    tz.TZDateTime scheduledDate = tz.TZDateTime(tz.local, now.year, now.month, now.day, 22, 0);
+    if (scheduledDate.isBefore(now)) {
+      scheduledDate = scheduledDate.add(const Duration(days: 1));
+    }
+    print('Next instance of 10 PM: $scheduledDate');
+    return scheduledDate;
   }
 
   tz.TZDateTime _nextInstanceOf29th() {
@@ -217,10 +268,9 @@ class NotificationService {
     if (scheduledDate.isBefore(now)) {
       scheduledDate = tz.TZDateTime(tz.local, now.year, now.month + 1, 29, 22);
     }
+    print('Next instance of 29th: $scheduledDate');
     return scheduledDate;
   }
-
-
 
   void _scheduleMonthlyReminderOn29th() async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
@@ -235,51 +285,73 @@ class NotificationService {
     final tz.TZDateTime scheduledDate = _nextInstanceOf29th();
     print('Scheduling monthly reminder at: $scheduledDate');
 
-    await _localNotifications.zonedSchedule(
-      1,
-      'Monthly Summary Report',
-      "Your monthly spending summary is ready. Check out where your money went!",
-      scheduledDate,
-      platformChannelSpecifics,
-      androidAllowWhileIdle: true,
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: DateTimeComponents.dayOfMonthAndTime,
-    );
+    try {
+      await _localNotifications.zonedSchedule(
+        1,
+        'Monthly Summary Report',
+        "Your monthly spending summary is ready. Check out where your money went!",
+        scheduledDate,
+        platformChannelSpecifics,
+        androidAllowWhileIdle: true,
+        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.dayOfMonthAndTime,
+      );
+      print('Monthly reminder scheduled for: $scheduledDate');
+    } catch (e) {
+      print("Error scheduling monthly reminder: $e");
+    }
   }
 
-  void _scheduleDailyMotivationReminder(String title ,String body) async {
+  void _testImmediateNotification() async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      'daily_reminder_channel',
-      'Daily Reminder Notifications',
-      channelDescription: 'This channel is used for daily reminder notifications',
+      'test_channel',
+      'Test Notifications',
       importance: Importance.max,
       priority: Priority.high,
-      showWhen: true
-      ,
-    );    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-
-
-
-    final tz.TZDateTime scheduledDate = _nextInstanceOfTenPM();
-    print('Scheduling daily reminder at: $scheduledDate');
-
-    await _localNotifications.show(
-      3,
-      title,
-      body,
-      platformChannelSpecifics
-
-
-
+      showWhen: true,
     );
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    try {
+      await _localNotifications.show(
+        1,
+        'Immediate Test Notification',
+        'This is a test notification.',
+        platformChannelSpecifics,
+      );
+      print('Immediate test notification shown');
+    } catch (e) {
+      print("Error showing test notification: $e");
+    }
   }
 
-  tz.TZDateTime _nextInstanceOfTenPM() {
-    tz.TZDateTime now = tz.TZDateTime.now(tz.local);
-    tz.TZDateTime scheduledDate = tz.TZDateTime(tz.local, now.year, now.month, now.day, 18,57);
-    if (scheduledDate.isBefore(now)) {
-      scheduledDate = scheduledDate.add(const Duration(days: 1));
+  void _testImmediateScheduledNotification() async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'test_channel',
+      'Test Scheduled Notifications',
+      importance: Importance.max,
+      priority: Priority.high,
+      showWhen: true,
+    );
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    final tz.TZDateTime scheduledDate = tz.TZDateTime.now(tz.local).add(const Duration(seconds: 10));
+    print('Scheduling immediate test scheduled notification at: $scheduledDate');
+
+    try {
+      await _localNotifications.zonedSchedule(
+        2,
+        'Scheduled Test Notification',
+        'This is a test scheduled notification.',
+        scheduledDate,
+        platformChannelSpecifics,
+        androidAllowWhileIdle: true,
+        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+      print('Immediate test scheduled notification scheduled for: $scheduledDate');
+    } catch (e) {
+      print("Error scheduling immediate test scheduled notification: $e");
     }
-    return scheduledDate;
   }
 }

@@ -242,7 +242,7 @@ class TransactionListView extends StatelessWidget {
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       Text(
-                                        '\$${transaction.amount.toStringAsFixed(2)}',
+                                        '₪${transaction.amount.toStringAsFixed(2)}',
                                         style: const TextStyle(
                                           color: Colors.red,
                                           fontWeight: FontWeight.bold,
