@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class NotificationModel {
+class Notifications{
   final String userId;
   final String title;
   final String body;
   final Timestamp timestamp;
 
-  NotificationModel({
+  Notifications({
     required this.userId,
     required this.title,
     required this.body,
@@ -22,8 +22,8 @@ class NotificationModel {
     };
   }
 
-  factory NotificationModel.fromJson(Map<String, dynamic> json) {
-    return NotificationModel(
+  factory Notifications.fromJson(Map<String, dynamic> json) {
+    return Notifications(
       userId: json['userId'],
       title: json['title'],
       body: json['body'],
