@@ -1,4 +1,5 @@
 import 'package:budget_buddy/views/budget_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/budget_model.dart';
@@ -14,6 +15,7 @@ class EditBudgetScreen extends StatefulWidget {
   _EditBudgetScreenState createState() => _EditBudgetScreenState();
 }
 
+
 class _EditBudgetScreenState extends State<EditBudgetScreen> {
   final EditBudgetViewModel editBudgetViewModel = EditBudgetViewModel();
   final TextEditingController balanceController = TextEditingController();
@@ -24,6 +26,10 @@ class _EditBudgetScreenState extends State<EditBudgetScreen> {
   bool isSaving = false;
   bool isLoading = true;
 
+
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  
   @override
   void initState() {
     super.initState();
@@ -57,21 +63,29 @@ class _EditBudgetScreenState extends State<EditBudgetScreen> {
     setState(() {
       isSaving = true;
     });
-
-    User? currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser != null && editBudgetViewModel.currentBudget != null) {
-      double parsedBalance = double.tryParse(balanceController.text) ?? 0.0; // Parse once and use for both
-      Budget updatedBudget = Budget(
-          id: editBudgetViewModel.currentBudget!.id, // Preserves the existing ID
-          budgetName: nameController.text,
-          totalRemaining: parsedBalance, // Assuming totalRemaining is initialized with the same value as totalBudget
-          totalBudget: parsedBalance,
-          note: noteController.text,
-          fromDate: DateTime.now(), // Setting fromDate to now, adjust as necessary
-          toDate: calculateToDate(DateTime.now(), selectedFrequency)
-      );
-      await editBudgetViewModel.updateBudget(currentUser.uid, updatedBudget);
-    }
+    QuerySnapshot budgetQuery = await firestore
+        .collection('users')
+        .doc(auth.currentUser!.uid)
+        .collection('budget')
+        .limit(1)  // Assumes there is only one budget per user
+        .get().then((value) async {
+      User? currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        double parsedBalance = double.tryParse(balanceController.text) ?? 0.0; // Parse once and use for both
+        Budget updatedBudget = Budget(
+            id: value.docs[0].get("id"), // Preserves the existing ID
+            budgetName: nameController.text,
+            totalRemaining: (parsedBalance+value.docs[0].get("totalRemaining")), // Assuming totalRemaining is initialized with the same value as totalBudget
+            totalBudget: parsedBalance,
+            note: noteController.text,
+            fromDate: DateTime.now(), // Setting fromDate to now, adjust as necessary
+            toDate: calculateToDate(DateTime.now(), selectedFrequency)
+        );
+        await editBudgetViewModel.updateBudget(currentUser.uid, updatedBudget);
+      }
+      return value;
+    });
+    
 
     setState(() {
       isSaving = false;
@@ -105,6 +119,7 @@ class _EditBudgetScreenState extends State<EditBudgetScreen> {
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const BudgetScreen()))
         ),
+
         title: const Text("Edit Income", style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.transparent,
