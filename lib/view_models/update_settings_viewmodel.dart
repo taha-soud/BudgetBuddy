@@ -9,28 +9,34 @@ class UserViewModel extends ChangeNotifier {
 
   User? get currentUser => _auth.currentUser;
 
-  Future<String> updateUserDetail(String detailType, String newValue, [String? confirmPassword]) async {
+  Future<String> updateUserDetail(String detailType, String newValue, [String? confirmPassword, String? currentPassword]) async {
     try {
       switch (detailType) {
         case 'Username':
           await _firestore.collection('users').doc(currentUser!.uid).update({'username': newValue});
           await currentUser!.updateDisplayName(newValue);
           break;
-        case 'Email':
-          String? emailValidation = Validator.validateEmail(newValue); // Validate email format
-          if (emailValidation != null) return emailValidation;
-
-          await currentUser!.verifyBeforeUpdateEmail(newValue);
-          await _firestore.collection('users').doc(currentUser!.uid).update({'email': newValue});
-          break;
         case 'Password':
-          String? passwordValidation = Validator.validatePassword(newValue); // Validate new password
+          String? passwordValidation = Validator.validatePassword(newValue);
           if (passwordValidation != null) return passwordValidation;
 
-          String? confirmPasswordValidation = Validator.validateConfirmPassword(confirmPassword, newValue); // Confirm password match
+          String? confirmPasswordValidation = Validator.validateConfirmPassword(confirmPassword, newValue);
           if (confirmPasswordValidation != null) return confirmPasswordValidation;
 
-          await currentUser!.updatePassword(newValue);
+          if (currentPassword == null || currentPassword.isEmpty) {
+            return "Current password is required";
+          }
+
+          try {
+            AuthCredential credential = EmailAuthProvider.credential(
+              email: currentUser!.email!,
+              password: currentPassword,
+            );
+            await currentUser!.reauthenticateWithCredential(credential);
+            await currentUser!.updatePassword(newValue);
+          } catch (e) {
+            return "Current password is incorrect";
+          }
           break;
         default:
           return 'Invalid detail type';

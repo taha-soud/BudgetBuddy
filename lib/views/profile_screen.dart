@@ -94,7 +94,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           subtitle: const Text('Make changes to your account'),
                           trailing: const Icon(Icons.arrow_forward_ios),
                           onTap: () {
-                            Navigator.push(
+                            Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => const MyAccountSettingsScreen(),
