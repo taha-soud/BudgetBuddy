@@ -1,4 +1,5 @@
 import 'package:budget_buddy/services/budget_provider.dart';
+import 'package:budget_buddy/services/transaction_provider.dart';
 import 'package:budget_buddy/view_models/add_budget_viewmodel.dart';
 import 'package:budget_buddy/view_models/transactionSubCard_viewmodel.dart';
 import 'package:budget_buddy/view_models/update_settings_viewmodel.dart';
@@ -21,6 +22,8 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => UserViewModel()),
         ChangeNotifierProvider(create: (_) => AddBudgetViewModel()),
+        ChangeNotifierProvider(create: (_) => BudgetProvider()),
+        ChangeNotifierProvider(create: (_) => TransactionsProvider()),
       ],
       child: MyApp(),
     ),
