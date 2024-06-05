@@ -4,7 +4,7 @@ class Budget {
   final String note;
   final DateTime fromDate;
   final DateTime toDate;
-  final double totalRemaining;
+  late final double totalRemaining;
   final double totalBudget;
 
   Budget({

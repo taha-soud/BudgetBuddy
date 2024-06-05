@@ -66,4 +66,32 @@ class HomeViewModel {
 
     return spendingByCategory;
   }
+  Future<Map<String, double>> fetchBudgetOverview() async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      return {'Income': 0.0, 'Outcome': 0.0, 'Left': 0.0};
+    }
+
+    try {
+      final budgetSnapshot = await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('budget')
+          .orderBy('toDate', descending: true)
+          .limit(1)
+          .get();
+
+      if (budgetSnapshot.docs.isNotEmpty) {
+        final data = budgetSnapshot.docs.first.data();
+        double totalBudget = (data['totalBudget'] as num? ?? 0).toDouble();
+        double totalRemaining = (data['totalRemaining'] as num? ?? 0).toDouble();
+        double totalSpent = totalBudget - totalRemaining;
+        return {'Income': totalBudget, 'Outcome': totalSpent, 'Left': totalRemaining};
+      }
+    } catch (e) {
+      print('Error fetching budget data: $e');
+    }
+
+    return {'Income': 0.0, 'Outcome': 0.0, 'Left': 0.0};
+  }
 }

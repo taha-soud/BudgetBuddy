@@ -4,8 +4,9 @@ import 'package:budget_buddy/services/transaction_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../res/custom_color.dart';
-import '../utils/icons.dart'; // Utility to fetch icon data
-import '../view_models/report_viewmodel.dart'; // Your ViewModel
+import '../utils/icons.dart';  
+import '../view_models/report_viewmodel.dart';
+import 'home_screen.dart';  
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({Key? key}) : super(key: key);
@@ -55,7 +56,11 @@ class _ReportScreenState extends State<ReportScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => {
+          Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          )}
         ),
         title: const Text("Report", style: TextStyle(color: Colors.white)),
         centerTitle: true,
@@ -122,8 +127,8 @@ class _ReportScreenState extends State<ReportScreen> {
           ),
           Spacer(),
           _buildTimeToggle(),
-          SizedBox(height: 10),
-          Align(
+          const SizedBox(height: 10),
+          const Align(
             alignment: Alignment.centerLeft,
             child: Padding(
               padding: EdgeInsets.only(left: 16.0),
@@ -293,6 +298,7 @@ class _ReportScreenState extends State<ReportScreen> {
         ),
         const SizedBox(height: 8.0),
         Text(label),
+
       ],
     );
   }
@@ -340,6 +346,7 @@ class _ReportScreenState extends State<ReportScreen> {
               fontWeight: FontWeight.bold,
             ),
           ),
+
         ),
       );
 }
