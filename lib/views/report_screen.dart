@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../res/custom_color.dart';
 import '../utils/icons.dart';  // Utility to fetch icon data
-import '../view_models/report_viewmodel.dart';  // Your ViewModel
+import '../view_models/report_viewmodel.dart';
+import 'home_screen.dart';  // Your ViewModel
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({Key? key}) : super(key: key);
@@ -39,7 +40,11 @@ class _ReportScreenState extends State<ReportScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => {
+          Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          )}
         ),
         title: const Text("Report", style: TextStyle(color: Colors.white)),
         centerTitle: true,
@@ -48,10 +53,10 @@ class _ReportScreenState extends State<ReportScreen> {
       ),
       body: Column(
         children: [
-          Spacer(),
+          const Spacer(),
           _buildTimeToggle(),
-          SizedBox(height: 10),
-          Align(
+          const SizedBox(height: 10),
+          const Align(
             alignment: Alignment.centerLeft,
             child: Padding(
               padding: EdgeInsets.only(left: 16.0),
@@ -69,9 +74,9 @@ class _ReportScreenState extends State<ReportScreen> {
                   margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                   child: ListTile(
                     leading: Icon(getIconData(data['categoryIcon']), color: AppColors.primary),
-                    title: Text(key, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                    title: Text(key, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                     subtitle: Text('${data['totalCount']} transactions', style: TextStyle(color: Colors.grey[850])),
-                    trailing: Text('-₪${data['totalAmount'].toStringAsFixed(2)}', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold,fontSize: 16)),
+                    trailing: Text('-₪${data['totalAmount'].toStringAsFixed(2)}', style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold,fontSize: 16)),
                   ),
                 );
               },
@@ -87,19 +92,19 @@ class _ReportScreenState extends State<ReportScreen> {
       color: Colors.white,
       borderRadius: BorderRadius.circular(40),
       boxShadow: [
-        BoxShadow(
+        const BoxShadow(
           color: Colors.black26,
           blurRadius: 10,
           offset: Offset(0, -5),
         ),
       ],
     ),
-    padding: EdgeInsets.symmetric(horizontal: 70, vertical: 6),
+    padding: const EdgeInsets.symmetric(horizontal: 70, vertical: 6),
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildToggleButton('Weekly', _isWeekly),
-        SizedBox(width: 8), // Spacing between buttons
+        const SizedBox(width: 8), // Spacing between buttons
         _buildToggleButton('Monthly', !_isWeekly),
       ],
     ),
@@ -113,7 +118,7 @@ class _ReportScreenState extends State<ReportScreen> {
       });
     },
     child: Container(
-      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
       decoration: BoxDecoration(
         color: isSelected ? Colors.black : Colors.grey[300],
         borderRadius: BorderRadius.circular(30),

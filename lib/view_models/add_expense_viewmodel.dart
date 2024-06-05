@@ -2,8 +2,11 @@ import 'package:budget_buddy/views/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 import '../models/category_model.dart';
 import '../models/transaction_model.dart';
+import '../models/budget_model.dart';
+import '../view_models/notification_view_model.dart';
 
 class ExpenseViewModel {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -33,6 +36,7 @@ class ExpenseViewModel {
     if (querySnapshot.docs.isNotEmpty) {
       var budgetDoc = querySnapshot.docs.first;
       double currentRemaining = budgetDoc.data()['totalRemaining'];
+      double totalBudget = budgetDoc.data()['totalBudget'];
 
       // Check if the transaction amount is greater than the current remaining budget
       if (transaction.amount > currentRemaining) {
@@ -55,11 +59,28 @@ class ExpenseViewModel {
           backgroundColor: Colors.green,
         ));
 
+        Budget budget = Budget(
+          id: budgetDoc.data()['id'],
+          budgetName: budgetDoc.data()['budgetName'],
+          note: budgetDoc.data()['note'],
+          fromDate: DateTime.parse(budgetDoc.data()['fromDate']),
+          toDate: DateTime.parse(budgetDoc.data()['toDate']),
+          totalRemaining: newRemaining,
+          totalBudget: budgetDoc.data()['totalBudget'],
+        );
+
+        // Log the budget information
+        print("Budget details: $budget");
+
+        // Call the checkAndSendBudgetThresholdAlert function
+        NotificationViewModel notificationViewModel = Provider.of<NotificationViewModel>(context, listen: false);
+        notificationViewModel.checkAndSendBudgetThresholdAlert(budget);
+
         // Navigate to Home Screen
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => const HomeScreen()),
-              (Route<dynamic> route) => false,  // This will remove all the routes below the pushed route
+              (Route<dynamic> route) => false,
         );
       } catch (error) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(

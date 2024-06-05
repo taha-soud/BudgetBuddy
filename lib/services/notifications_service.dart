@@ -43,7 +43,7 @@ class NotificationService {
     // Schedule daily reminder at 1:20 PM
     _scheduleDailyExpenseReminder();
 
-  Timer.periodic(const Duration(seconds: 120), (timer) {
+    Timer.periodic(const Duration(seconds: 2), (timer) {
       _scheduleDailyMotivationReminder("Motivation Reminder","Small steps, big changes. Keep going!");
 
     });
@@ -264,10 +264,10 @@ class NotificationService {
     print('Scheduling daily reminder at: $scheduledDate');
 
     await _localNotifications.show(
-      3,
-      title,
-      body,
-      platformChannelSpecifics
+        3,
+        title,
+        body,
+        platformChannelSpecifics
 
 
 
