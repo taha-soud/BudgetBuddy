@@ -31,13 +31,20 @@ class Budget {
 
   factory Budget.fromJson(Map<String, dynamic> json) {
     return Budget(
-      id: json['id'],
-      note:json['note'],
-      budgetName: json['budgetName'],
-      fromDate: DateTime.parse(json['fromDate']),
-      toDate: DateTime.parse(json['toDate']),
-      totalRemaining: json['totalRemaining'],
-      totalBudget: json['totalBudget'],
+      id: json['id'] ??
+          '', // Provide a default value or handle null case appropriately
+      note: json['note'] ??
+          '', // Provide a default value or handle null case appropriately
+      budgetName: json['budgetName'] ??
+          '', // Provide a default value or handle null case appropriately
+      fromDate: DateTime.parse(json['fromDate'] ??
+          ''), // Provide a default value or handle null case appropriately
+      toDate: DateTime.parse(json['toDate'] ??
+          ''), // Provide a default value or handle null case appropriately
+      totalRemaining: (json['totalRemaining'] ?? 0)
+          .toDouble(), // Handle null or non-numeric values
+      totalBudget: (json['totalBudget'] ?? 0)
+          .toDouble(), // Handle null or non-numeric values
     );
   }
 }
