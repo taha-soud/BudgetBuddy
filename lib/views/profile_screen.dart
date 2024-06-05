@@ -147,7 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           subtitle: const Text('View privacy policy'),
                           trailing: const Icon(Icons.arrow_forward_ios),
                           onTap: () {
-                            Navigator.push(
+                            Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => const PrivacyPolicyScreen(),
@@ -161,7 +161,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           subtitle: const Text('Learn more about the app'),
                           trailing: const Icon(Icons.arrow_forward_ios),
                           onTap: () {
-                            Navigator.push(
+                            Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => const AboutAppScreen(),

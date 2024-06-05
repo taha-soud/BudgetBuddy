@@ -59,7 +59,7 @@ class MyAccountSettingsScreen extends StatelessWidget {
         subtitle: Text("Current: $currentValue", style: const TextStyle(color: Colors.white70)),
         trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white),
         onTap: () {
-          Navigator.of(context).push(
+          Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) => ChangeDetailScreen(detailType: title),
             ),

@@ -72,7 +72,6 @@ class SignUpViewModel {
 
       await FirebaseFirestore.instance.collection('users').doc(uid).set(newUser.toJson());
 
-      await userCredential.user!.sendEmailVerification();
 
     } catch (e) {
       rethrow;
