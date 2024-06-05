@@ -8,11 +8,10 @@ class TransactionPageViewModel {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Stream to fetch all transactions for the current user and include category details
   Stream<List<Map<String, dynamic>>> getAllTransactionsWithCategory() {
     var user = _auth.currentUser;
     if (user == null) {
-      return Stream.empty();  // Returns an empty stream if the user is not logged in.
+      return Stream.empty();
     }
 
     return _firestore
@@ -34,7 +33,7 @@ class TransactionPageViewModel {
           transactionsWithCategories.add({
             'transaction': Transactions.fromJson(transactionData),
             'categoryName': categoryData['name'],
-            'categoryIcon': categoryData['icon'] // Icon name as string
+            'categoryIcon': categoryData['icon']
           });
         }
       }
@@ -45,37 +44,62 @@ class TransactionPageViewModel {
 
   Future<List<Map<String, dynamic>>> searchTransactions(String query) async {
     List<Map<String, dynamic>> allTransactions =
-        await getAllTransactionsWithCategory().first;
+    await getAllTransactionsWithCategory().first;
 
     List<Map<String, dynamic>> filteredTransactions =
-        allTransactions.where((transaction) {
+    allTransactions.where((transaction) {
       var transactionData = transaction['transaction'] as Transactions;
 
-      // Check if the query matches the category name
       bool matchesCategory =
-          transaction['categoryName']?.toLowerCase() == query.toLowerCase();
+          transaction['categoryName']?.toLowerCase().contains(query.toLowerCase()) ?? false;
 
-      // Check if the query matches the amount
       bool matchesAmount = false;
       try {
         double queryAmount = double.parse(query);
         matchesAmount = transactionData.amount == queryAmount;
       } catch (e) {
-        // Ignore if parsing fails, query is not an amount
       }
 
-      // Check if the query matches the date
       bool matchesDate = false;
       try {
         DateTime queryDate = DateTime.parse(query);
         matchesDate = transactionData.date == queryDate;
       } catch (e) {
-        // Ignore if parsing fails, query is not a date
       }
 
       return matchesCategory || matchesAmount || matchesDate;
     }).toList();
 
     return filteredTransactions;
+  }
+
+  Future<void> deleteTransaction(String transactionId) async {
+    var user = _auth.currentUser;
+    if (user == null) return;
+
+    DocumentSnapshot transactionDoc = await _firestore.collection('transaction').doc(transactionId).get();
+    if (!transactionDoc.exists) return;
+    double transactionAmount = (transactionDoc.data() as Map<String, dynamic>)['amount'];
+
+    await _firestore.collection('transaction').doc(transactionId).delete();
+
+    QuerySnapshot budgetQuery = await _firestore
+        .collection('users')
+        .doc(user.uid)
+        .collection('budget')
+        .limit(1)
+        .get();
+
+    if (budgetQuery.docs.isEmpty) return;
+    DocumentSnapshot budgetDoc = budgetQuery.docs.first;
+
+    double totalRemaining = (budgetDoc.data() as Map<String, dynamic>)['totalRemaining'] ?? 0;
+    double updatedTotalRemaining = totalRemaining + transactionAmount;
+
+    await _firestore.collection('users')
+        .doc(user.uid)
+        .collection('budget')
+        .doc(budgetDoc.id)
+        .update({'totalRemaining': updatedTotalRemaining});
   }
 }

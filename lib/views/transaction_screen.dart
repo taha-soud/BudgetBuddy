@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../models/transaction_model.dart';
 import '../res/custom_color.dart';
 import '../utils/handling-date.dart';
 import '../utils/icons.dart';
 import '../view_models/transactions_viewmodel.dart';
 import 'bottom_bar.dart';
-import 'package:intl/intl.dart';
 
 class TransactionScreen extends StatefulWidget {
   const TransactionScreen({Key? key}) : super(key: key);
@@ -17,7 +17,7 @@ class TransactionScreen extends StatefulWidget {
 class _TransactionScreenState extends State<TransactionScreen> {
   final TransactionPageViewModel _viewModel = TransactionPageViewModel();
   String _searchQuery = '';
-  String _sortBy = 'Name'; // Default sorting option
+  String _sortBy = 'Date';
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +26,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
       child: Scaffold(
         backgroundColor: AppColors.primary,
         appBar: AppBar(
-          title:
-              const Text('Transactions', style: TextStyle(color: Colors.white)),
+          title: const Text('Transactions', style: TextStyle(color: Colors.white)),
           centerTitle: true,
           backgroundColor: AppColors.primary,
         ),
@@ -70,7 +69,7 @@ class TransactionListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -89,7 +88,6 @@ class TransactionListView extends StatelessWidget {
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       vertical: 15.0,
-                      horizontal: 20.0,
                     ),
                   ),
                   style: const TextStyle(color: AppColors.primary),
@@ -141,7 +139,6 @@ class TransactionListView extends StatelessWidget {
                   );
                 }
 
-                // Filter and sort transactions based on search query and sorting option
                 var transactions = snapshot.data!;
                 if (searchQuery.isNotEmpty) {
                   transactions = transactions.where((transaction) {
@@ -161,12 +158,10 @@ class TransactionListView extends StatelessWidget {
                       .compareTo(a['transaction'].amount));
                 } else {
                   transactions.sort(
-                      (a, b) => a['categoryName'].compareTo(b['categoryName']));
+                          (a, b) => a['categoryName'].compareTo(b['categoryName']));
                 }
 
-                // Group transactions by date
-                final groupedTransactions =
-                    <String, List<Map<String, dynamic>>>{};
+                final groupedTransactions = <String, List<Map<String, dynamic>>>{};
                 for (var item in transactions) {
                   var transaction = item['transaction'] as Transactions;
                   var dateCategory = formatDate(transaction.date);
@@ -178,15 +173,13 @@ class TransactionListView extends StatelessWidget {
 
                 return ListView(
                   children: groupedTransactions.entries.map((entry) {
-                    var date = entry.key;
-                    var transactions = entry.value;
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Text(
-                            date,
+                            entry.key,
                             style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -194,73 +187,76 @@ class TransactionListView extends StatelessWidget {
                             ),
                           ),
                         ),
-                        ...transactions.map((item) {
+                        ...entry.value.map((item) {
                           var transaction = item['transaction'] as Transactions;
                           var categoryName = item['categoryName'] as String;
-                          var categoryIcon = item['categoryIcon']
-                              as String; // Icon name from Firestore
+                          var categoryIcon = item['categoryIcon'] as String;
 
                           return Card(
                             color: AppColors.secondary,
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 16.0, vertical: 8.0),
+                            margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15.0),
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Row(
-                                children: [
-                                  Icon(getIconData(categoryIcon),
-                                      size: 40, color: AppColors.tertiary),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                              padding: const EdgeInsets.all(8.0),
+                              child: IntrinsicHeight(
+                                child: Row(
+                                  children: [
+                                    Icon(getIconData(categoryIcon), size: 40, color: AppColors.tertiary),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            categoryName,
+                                            style: const TextStyle(
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            transaction.description,
+                                            style: const TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          categoryName,
+                                          '₪${transaction.amount.toStringAsFixed(2)}',
                                           style: const TextStyle(
-                                            color: Colors.black,
+                                            color: Colors.red,
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16,
                                           ),
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          transaction.description,
+                                          DateFormat('yyyy-MM-dd – kk:mm').format(transaction.date),
                                           style: const TextStyle(
-                                            color: Colors.black,
+                                            color: Colors.green,
                                             fontSize: 14,
                                           ),
                                         ),
                                       ],
                                     ),
-                                  ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        '₪${transaction.amount.toStringAsFixed(2)}',
-                                        style: const TextStyle(
-                                          color: Colors.red,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        DateFormat('yyyy-MM-dd – kk:mm')
-                                            .format(transaction.date),
-                                        style: const TextStyle(
-                                          color: Colors.green,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                    IconButton(
+                                      icon: Icon(Icons.more_vert, color: Colors.black),
+                                      onPressed: () => _showMenu(context, item),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           );
@@ -274,6 +270,62 @@ class TransactionListView extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showMenu(BuildContext context, Map<String, dynamic> item) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 80,
+          child: ListTile(
+            leading: Icon(Icons.delete, color: Colors.red),
+            title: Text('Delete'),
+            onTap: () {
+              Navigator.pop(context);
+              _confirmDelete(context, item);
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  void _confirmDelete(BuildContext context, Map<String, dynamic> item) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Delete'),
+          content: Text('Are you sure you want to delete this transaction?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Delete'),
+              onPressed: () {
+                viewModel.deleteTransaction(item['transaction'].id).then((_) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('Transaction deleted successfully'),
+                    duration: Duration(seconds: 2),
+                  ));
+                }).catchError((error) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('Failed to delete transaction'),
+                    duration: Duration(seconds: 2),
+                  ));
+                });
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
