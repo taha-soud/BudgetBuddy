@@ -8,14 +8,14 @@ import '../services/notifications_service.dart';
 class NotificationViewModel extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   NotificationService? _notificationService;
-  List<NotificationModel> _notifications = [];
+  List<Notifications> _notifications = [];
   bool _isLoading = true;
 
   NotificationViewModel(this._notificationService) {
     _fetchNotifications();
   }
 
-  List<NotificationModel> get notifications => _notifications;
+  List<Notifications> get notifications => _notifications;
   bool get isLoading => _isLoading;
 
   void updateNotificationService(NotificationService notificationService) {
@@ -33,7 +33,7 @@ class NotificationViewModel extends ChangeNotifier {
           .orderBy('timestamp', descending: true)
           .get();
 
-      _notifications = querySnapshot.docs.map((doc) => NotificationModel.fromJson(doc.data())).toList();
+      _notifications = querySnapshot.docs.map((doc) => Notifications.fromJson(doc.data())).toList();
     } catch (e) {
       print("Error fetching notifications: $e");
     } finally {

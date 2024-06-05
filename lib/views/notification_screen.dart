@@ -1,6 +1,7 @@
 import 'package:budget_buddy/views/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart'; // Import intl package
 import '../res/custom_color.dart';
 import '../view_models/notification_view_model.dart';
 
@@ -14,10 +15,11 @@ class NotificationScreen extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () =>  Navigator.pushReplacement(
+          onPressed: () => Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) => const HomeScreen()),
+              builder: (context) => const HomeScreen(),
+            ),
           ),
         ),
         title: const Text("Notifications", style: TextStyle(color: Colors.white)),
@@ -42,23 +44,55 @@ class NotificationScreen extends StatelessWidget {
             );
           }
 
-          return ListView.builder(
-            itemCount: viewModel.notifications.length,
-            itemBuilder: (context, index) {
-              final notification = viewModel.notifications[index];
-              return Card(
-                color: Colors.white,
-                margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                child: ListTile(
-                  title: Text(notification.title),
-                  subtitle: Text(notification.body),
-                  trailing: Text(
-                    notification.timestamp.toDate().toString(),
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                ListView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: viewModel.notifications.length,
+                  itemBuilder: (context, index) {
+                    final notification = viewModel.notifications[index];
+                    final formattedTimestamp = DateFormat('MMM dd, yyyy HH:mm').format(notification.timestamp.toDate()); // Format the timestamp
+
+                    return Card(
+                      color: Colors.white,
+                      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                      child: Container(
+                        height: 100, // Set the desired height for all cards
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                notification.title,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(height: 8.0),
+                            Flexible(
+                              child: Text(
+                                notification.body,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(height: 8.0),
+                            Text(
+                              formattedTimestamp, // Display the formatted timestamp
+                              style: const TextStyle(fontSize: 12, color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
+              ],
+            ),
           );
         },
       ),

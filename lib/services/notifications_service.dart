@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -16,16 +15,15 @@ class NotificationService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   NotificationService() {
+    tz.initializeTimeZones();
     init();
   }
 
   void init() async {
-
     const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
     final InitializationSettings initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
     await _localNotifications.initialize(initializationSettings);
     print(tz.local);
-    tz.initializeTimeZones();
     await requestPermissions();
     _initializeLocalNotifications();
 
@@ -37,20 +35,18 @@ class NotificationService {
     }
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      _showNotification(message);
+      _showNotification(message.notification?.title ?? "Budget Tracker Alert", message.notification?.body ?? "You have a new notification.");
     });
 
-    // Schedule daily reminder at 1:20 PM
     _scheduleDailyExpenseReminder();
+    _scheduleMonthlyReminderOn29th();
 
-  Timer.periodic(const Duration(seconds: 120), (timer) {
-      _scheduleDailyMotivationReminder("Motivation Reminder","Small steps, big changes. Keep going!");
-
+    Timer.periodic(const Duration(seconds: 120), (timer) {
+      _scheduleDailyMotivationReminder("Motivation Reminder", "Small steps, big changes. Keep going!");
     });
 
     Timer.periodic(const Duration(seconds: 360), (timer) {
-      _scheduleDailyMotivationReminder("Motivation Reminder","Budgeting is making dreams possible!");
-
+      _scheduleDailyMotivationReminder("Motivation Reminder", "Budgeting is making dreams possible!");
     });
   }
 
@@ -85,19 +81,11 @@ class NotificationService {
 
   void _initializeLocalNotifications() {
     const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-    );
-
+    const InitializationSettings initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
     _localNotifications.initialize(initializationSettings);
   }
 
-  void _showNotification(RemoteMessage message) async {
-    String notificationTitle = message.notification?.title ?? "Budget Tracker Alert";
-    String notificationBody = message.notification?.body ?? "You have a new notification.";
-
-    await _storeNotification(notificationTitle, notificationBody);
-
+  void _showNotification(String title, String body) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       'default_channel',
       'Default channel for notifications',
@@ -110,11 +98,15 @@ class NotificationService {
     try {
       await _localNotifications.show(
         0,
-        notificationTitle,
-        notificationBody,
+        title,
+        body,
         platformChannelSpecifics,
-        payload: message.data.toString(), // Use payload to pass data
+        payload: '', // Use payload to pass data if needed
       );
+      print("Notification shown: $title - $body");
+
+      // Store notification after it is shown
+      await _storeNotification(title, body);
     } catch (e) {
       print("Error showing notification: $e");
     }
@@ -126,7 +118,6 @@ class NotificationService {
     String body = "Warning: You have spent $formattedPercentage% of your allocated budget for '${budget.budgetName}' this month.";
 
     _showLocalNotification(title, body);
-    _storeNotification(title, body);
   }
 
   void sendExpenseReminder() {
@@ -134,7 +125,6 @@ class NotificationService {
     String body = "Reminder: Don't forget to log your expenses for today.";
 
     _showLocalNotification(title, body);
-    _storeNotification(title, body);
   }
 
   void sendMonthlySummaryReport() {
@@ -142,7 +132,6 @@ class NotificationService {
     String body = "Your monthly spending summary is ready. Check out where your money went!";
 
     _showLocalNotification(title, body);
-    _storeNotification(title, body);
   }
 
   void _showLocalNotification(String title, String body) async {
@@ -163,6 +152,10 @@ class NotificationService {
         platformChannelSpecifics,
         payload: 'item x',
       );
+      print("Local notification shown: $title - $body");
+
+      // Store notification after it is shown
+      await _storeNotification(title, body);
     } catch (e) {
       print("Error showing local notification: $e");
     }
@@ -172,7 +165,7 @@ class NotificationService {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
-    final notification = NotificationModel(
+    final notification = Notifications(
       userId: user.uid,
       title: title,
       body: body,
@@ -181,6 +174,7 @@ class NotificationService {
 
     try {
       await _firestore.collection('notification').add(notification.toJson());
+      print("Notification stored in Firestore: $title - $body");
     } catch (e) {
       print("Error storing notification: $e");
     }
@@ -209,6 +203,9 @@ class NotificationService {
       uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: DateTimeComponents.time,
     );
+
+    // Store notification in Firestore
+    await _storeNotification('Expense Reminder', "Don't forget to log your expenses for today.");
   }
 
   tz.TZDateTime _nextInstanceOf29th() {
@@ -219,8 +216,6 @@ class NotificationService {
     }
     return scheduledDate;
   }
-
-
 
   void _scheduleMonthlyReminderOn29th() async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
@@ -245,20 +240,21 @@ class NotificationService {
       uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: DateTimeComponents.dayOfMonthAndTime,
     );
+
+    // Store notification in Firestore
+    await _storeNotification('Monthly Summary Report', "Your monthly spending summary is ready. Check out where your money went!");
   }
 
-  void _scheduleDailyMotivationReminder(String title ,String body) async {
+  void _scheduleDailyMotivationReminder(String title, String body) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       'daily_reminder_channel',
       'Daily Reminder Notifications',
       channelDescription: 'This channel is used for daily reminder notifications',
       importance: Importance.max,
       priority: Priority.high,
-      showWhen: true
-      ,
-    );    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-
-
+      showWhen: true,
+    );
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
 
     final tz.TZDateTime scheduledDate = _nextInstanceOfTenPM();
     print('Scheduling daily reminder at: $scheduledDate');
@@ -267,16 +263,15 @@ class NotificationService {
       3,
       title,
       body,
-      platformChannelSpecifics
-
-
-
+      platformChannelSpecifics,
     );
+
+    await _storeNotification(title, body);
   }
 
   tz.TZDateTime _nextInstanceOfTenPM() {
     tz.TZDateTime now = tz.TZDateTime.now(tz.local);
-    tz.TZDateTime scheduledDate = tz.TZDateTime(tz.local, now.year, now.month, now.day, 18,57);
+    tz.TZDateTime scheduledDate = tz.TZDateTime(tz.local, now.year, now.month, now.day, 14, 47);
     if (scheduledDate.isBefore(now)) {
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
