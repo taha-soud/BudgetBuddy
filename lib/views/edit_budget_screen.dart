@@ -119,7 +119,8 @@ class _EditBudgetScreenState extends State<EditBudgetScreen> {
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const BudgetScreen()))
         ),
-        title: const Text("Add Budget", style: TextStyle(color: Colors.white)),
+
+        title: const Text("Edit Income", style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,

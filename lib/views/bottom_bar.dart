@@ -32,7 +32,7 @@ class BottomBar extends StatelessWidget {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.pie_chart),
-            label: 'Budget',
+            label: 'Income',
             backgroundColor: AppColors.primary,
           ),
           BottomNavigationBarItem(

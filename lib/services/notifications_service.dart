@@ -43,6 +43,7 @@ class NotificationService {
 
     Timer.periodic(const Duration(seconds: 120), (timer) {
       _scheduleDailyMotivationReminder("Motivation Reminder", "Small steps, big changes. Keep going!");
+
     });
 
     Timer.periodic(const Duration(seconds: 360), (timer) {
@@ -264,6 +265,7 @@ class NotificationService {
       title,
       body,
       platformChannelSpecifics,
+
     );
 
     await _storeNotification(title, body);

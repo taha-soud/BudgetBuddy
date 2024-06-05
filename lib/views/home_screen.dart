@@ -255,7 +255,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         const SizedBox(height: 5),
         Text(
-          '\$$amount',
+          '₪$amount',
           style: TextStyle(color: color, fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ],
