@@ -63,4 +63,16 @@ class BudgetProvider with ChangeNotifier {
     ];
     return months[month - 1];
   }
+
+  String getBudgetType(Budget budget) {
+    DateTime fromDate = DateTime.parse(budget.fromDate as String);
+    DateTime toDate = DateTime.parse(budget.toDate as String);
+    int differenceInDays = toDate.difference(fromDate).inDays;
+
+    if (differenceInDays <= 7) {
+      return "weekly";
+    } else {
+      return "monthly";
+    }
+  }
 }
