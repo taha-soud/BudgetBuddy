@@ -24,8 +24,12 @@ class ReportViewModel {
 
       Map<String, Map<String, dynamic>> categoryDetails = {};
       for (var doc in transactionSnapshot.docs) {
-        Transactions transaction = Transactions.fromJson(doc.data() as Map<String, dynamic>);
-        var categoryDoc = await _firestore.collection('category').doc(transaction.categoryId).get();
+        Transactions transaction =
+            Transactions.fromJson(doc.data() as Map<String, dynamic>);
+        var categoryDoc = await _firestore
+            .collection('category')
+            .doc(transaction.categoryId)
+            .get();
         var categoryName = categoryDoc.data()?['name'] ?? 'Unknown Category';
         var categoryIcon = categoryDoc.data()?['icon'] ?? 'Icons.help';
 
