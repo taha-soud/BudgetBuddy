@@ -28,7 +28,7 @@ git clone https://github.com/yourusername/budgetbuddy.git
 cd budgetbuddy
 
 
-3.Install dependencies:
+3.Install dependencies
 flutter pub get
 
 4.Run the application:
