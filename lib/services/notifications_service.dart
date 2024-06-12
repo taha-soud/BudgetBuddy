@@ -268,7 +268,6 @@ class NotificationService {
 
     );
 
-    await _storeNotification(title, body);
   }
 
   tz.TZDateTime _nextInstanceOfTenPM() {

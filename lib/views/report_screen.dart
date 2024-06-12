@@ -168,13 +168,13 @@ class _ReportScreenState extends State<ReportScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.textColor : Colors.grey[300],
+            color: isSelected ? Colors.grey: Colors.black,
             borderRadius: BorderRadius.circular(30),
           ),
           child: Text(
             text,
             style: TextStyle(
-              color: isSelected ? Colors.white : Colors.grey,
+              color: isSelected ? Colors.grey[200] : Colors.white,
               fontWeight: FontWeight.bold,
             ),
           ),
