@@ -18,6 +18,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
   final TransactionPageViewModel _viewModel = TransactionPageViewModel();
   String _searchQuery = '';
   String _sortBy = 'Date';
+  bool _ascending = true;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +27,8 @@ class _TransactionScreenState extends State<TransactionScreen> {
       child: Scaffold(
         backgroundColor: AppColors.primary,
         appBar: AppBar(
-          title: const Text('Transactions', style: TextStyle(color: Colors.white)),
+          title:
+              const Text('Transactions', style: TextStyle(color: Colors.white)),
           centerTitle: true,
           backgroundColor: AppColors.primary,
         ),
@@ -34,14 +36,16 @@ class _TransactionScreenState extends State<TransactionScreen> {
           viewModel: _viewModel,
           searchQuery: _searchQuery,
           sortBy: _sortBy,
+          ascending: _ascending,
           onSearchQueryChanged: (value) {
             setState(() {
               _searchQuery = value;
             });
           },
-          onSortByChanged: (value) {
+          onSortByChanged: (value, ascending) {
             setState(() {
               _sortBy = value;
+              _ascending = ascending;
             });
           },
         ),
@@ -54,14 +58,16 @@ class TransactionListView extends StatelessWidget {
   final TransactionPageViewModel viewModel;
   final String searchQuery;
   final String sortBy;
+  final bool ascending;
   final void Function(String) onSearchQueryChanged;
-  final void Function(String) onSortByChanged;
+  final void Function(String, bool) onSortByChanged;
 
   const TransactionListView({
     Key? key,
     required this.viewModel,
     required this.searchQuery,
     required this.sortBy,
+    required this.ascending,
     required this.onSearchQueryChanged,
     required this.onSortByChanged,
   }) : super(key: key);
@@ -98,31 +104,72 @@ class TransactionListView extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.filter_list, color: AppColors.secondary),
                 onPressed: () {
-                  showModalBottomSheet(
+                  showMenu(
                     context: context,
-                    builder: (BuildContext context) {
-                      return Container(
-                        height: 200,
-                        child: ListView(
-                          children: <String>['Name', 'Date', 'Amount']
-                              .map<Widget>((String value) {
-                            return ListTile(
-                              title: Text(value),
-                              onTap: () {
-                                Navigator.pop(context);
-                                onSortByChanged(value);
-                              },
-                            );
-                          }).toList(),
+                    position: RelativeRect.fromLTRB(1000.0, 100.0, 0.0, 0.0),
+                    items: <String>['Name', 'Date', 'Amount']
+                        .map<PopupMenuEntry<String>>((String value) {
+                      return PopupMenuItem<String>(
+                        value: value,
+                        child: ListTile(
+                          title: Text(value),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  Icons.arrow_upward,
+                                  color: sortBy == value && ascending
+                                      ? Colors.blue
+                                      : Colors.grey,
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  onSortByChanged(value, true);
+                                },
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.arrow_downward,
+                                  color: sortBy == value && !ascending
+                                      ? Colors.blue
+                                      : Colors.grey,
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  onSortByChanged(value, false);
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       );
-                    },
+                    }).toList(),
                   );
                 },
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: () {
+                onSortByChanged('Date', true);
+              },
+              child: const Text(
+                'Clear Filter',
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+                minimumSize: const Size(60, 0),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+              ),
+            ),
+          ),
           Expanded(
             child: StreamBuilder<List<Map<String, dynamic>>>(
               stream: viewModel.getAllTransactionsWithCategory(),
@@ -150,18 +197,25 @@ class TransactionListView extends StatelessWidget {
                 }
 
                 if (sortBy == 'Date') {
-                  transactions.sort((a, b) =>
-                      b['transaction'].date.compareTo(a['transaction'].date));
+                  transactions.sort((a, b) => ascending
+                      ? a['transaction'].date.compareTo(b['transaction'].date)
+                      : b['transaction'].date.compareTo(a['transaction'].date));
                 } else if (sortBy == 'Amount') {
-                  transactions.sort((a, b) => b['transaction']
-                      .amount
-                      .compareTo(a['transaction'].amount));
+                  transactions.sort((a, b) => ascending
+                      ? a['transaction']
+                          .amount
+                          .compareTo(b['transaction'].amount)
+                      : b['transaction']
+                          .amount
+                          .compareTo(a['transaction'].amount));
                 } else {
-                  transactions.sort(
-                          (a, b) => a['categoryName'].compareTo(b['categoryName']));
+                  transactions.sort((a, b) => ascending
+                      ? a['categoryName'].compareTo(b['categoryName'])
+                      : b['categoryName'].compareTo(a['categoryName']));
                 }
 
-                final groupedTransactions = <String, List<Map<String, dynamic>>>{};
+                final groupedTransactions =
+                    <String, List<Map<String, dynamic>>>{};
                 for (var item in transactions) {
                   var transaction = item['transaction'] as Transactions;
                   var dateCategory = formatDate(transaction.date);
@@ -172,29 +226,122 @@ class TransactionListView extends StatelessWidget {
                 }
 
                 return ListView(
-                  children: groupedTransactions.entries.map((entry) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Text(
-                            entry.key,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          ),
-                        ),
-                        ...entry.value.map((item) {
+                  children: (sortBy == 'Date' && ascending)
+                      ? groupedTransactions.entries.map((entry) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8.0),
+                                child: Text(
+                                  entry.key,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ),
+                              ...entry.value.map((item) {
+                                var transaction =
+                                    item['transaction'] as Transactions;
+                                var categoryName =
+                                    item['categoryName'] as String;
+                                var categoryIcon =
+                                    item['categoryIcon'] as String;
+
+                                return Card(
+                                  color: AppColors.secondary,
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 8.0, vertical: 4.0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: IntrinsicHeight(
+                                      child: Row(
+                                        children: [
+                                          Icon(getIconData(categoryIcon),
+                                              size: 40,
+                                              color: AppColors.tertiary),
+                                          const SizedBox(width: 10),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  categoryName,
+                                                  style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  transaction.description,
+                                                  style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                '₪${transaction.amount.toStringAsFixed(2)}',
+                                                style: const TextStyle(
+                                                  color: Colors.red,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                DateFormat('yyyy-MM-dd – kk:mm')
+                                                    .format(transaction.date),
+                                                style: const TextStyle(
+                                                  color: Colors.green,
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          IconButton(
+                                            icon: Icon(Icons.more_vert,
+                                                color: Colors.black),
+                                            onPressed: () =>
+                                                _showMenu(context, item),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ],
+                          );
+                        }).toList()
+                      : transactions.map((item) {
                           var transaction = item['transaction'] as Transactions;
                           var categoryName = item['categoryName'] as String;
                           var categoryIcon = item['categoryIcon'] as String;
 
                           return Card(
                             color: AppColors.secondary,
-                            margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 8.0, vertical: 4.0),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15.0),
                             ),
@@ -203,12 +350,15 @@ class TransactionListView extends StatelessWidget {
                               child: IntrinsicHeight(
                                 child: Row(
                                   children: [
-                                    Icon(getIconData(categoryIcon), size: 40, color: AppColors.tertiary),
+                                    Icon(getIconData(categoryIcon),
+                                        size: 40, color: AppColors.tertiary),
                                     const SizedBox(width: 10),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
                                           Text(
                                             categoryName,
@@ -230,8 +380,10 @@ class TransactionListView extends StatelessWidget {
                                       ),
                                     ),
                                     Column(
-                                      crossAxisAlignment: CrossAxisAlignment.end,
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Text(
                                           '₪${transaction.amount.toStringAsFixed(2)}',
@@ -243,7 +395,8 @@ class TransactionListView extends StatelessWidget {
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          DateFormat('yyyy-MM-dd – kk:mm').format(transaction.date),
+                                          DateFormat('yyyy-MM-dd – kk:mm')
+                                              .format(transaction.date),
                                           style: const TextStyle(
                                             color: Colors.green,
                                             fontSize: 14,
@@ -252,7 +405,8 @@ class TransactionListView extends StatelessWidget {
                                       ],
                                     ),
                                     IconButton(
-                                      icon: Icon(Icons.more_vert, color: Colors.black),
+                                      icon: Icon(Icons.more_vert,
+                                          color: Colors.black),
                                       onPressed: () => _showMenu(context, item),
                                     ),
                                   ],
@@ -261,9 +415,6 @@ class TransactionListView extends StatelessWidget {
                             ),
                           );
                         }).toList(),
-                      ],
-                    );
-                  }).toList(),
                 );
               },
             ),
