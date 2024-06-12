@@ -66,6 +66,7 @@ class HomeViewModel {
 
     return spendingByCategory;
   }
+
   Future<Map<String, double>> fetchBudgetOverview() async {
     final user = _auth.currentUser;
     if (user == null) {
@@ -73,6 +74,7 @@ class HomeViewModel {
     }
 
     try {
+      // Fetch the latest budget
       final budgetSnapshot = await _firestore
           .collection('users')
           .doc(user.uid)
@@ -81,13 +83,37 @@ class HomeViewModel {
           .limit(1)
           .get();
 
+      double totalBudget = 0.0;
+      double totalRemaining = 0.0;
+
       if (budgetSnapshot.docs.isNotEmpty) {
         final data = budgetSnapshot.docs.first.data();
-        double totalBudget = (data['totalBudget'] as num? ?? 0).toDouble();
-        double totalRemaining = (data['totalRemaining'] as num? ?? 0).toDouble();
-        double totalSpent = totalBudget - totalRemaining;
-        return {'Income': totalBudget, 'Outcome': totalSpent, 'Left': totalRemaining};
+        totalBudget = (data['totalBudget'] as num? ?? 0).toDouble();
+        totalRemaining = (data['totalRemaining'] as num? ?? 0).toDouble();
       }
+
+      // Fetch user transactions
+      final transactionSnapshot = await _firestore
+          .collection('transaction')
+          .where('userId', isEqualTo: user.uid)
+          .get();
+
+      double totalSpent = 0.0;
+
+      for (var doc in transactionSnapshot.docs) {
+        var data = doc.data();
+        var amount = data['amount'];
+
+        if (amount is int) {
+          totalSpent += amount.toDouble();
+        } else if (amount is double) {
+          totalSpent += amount;
+        }
+      }
+
+      double totalLeft = totalBudget - totalSpent;
+
+      return {'Income': totalBudget, 'Outcome': totalSpent, 'Left': totalLeft};
     } catch (e) {
       print('Error fetching budget data: $e');
     }
