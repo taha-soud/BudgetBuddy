@@ -25,15 +25,15 @@ class BudgetProvider with ChangeNotifier {
       String currentMonth = "${now.year}-${now.month.toString().padLeft(2, '0')}";
 
       final budgets = snapshot.docs.map((doc) {
-        Map<String, dynamic> data = doc.data();
-        String fromDateStr = data['fromDate'];
-        DateTime fromDate = DateTime.parse(fromDateStr);
+            Map<String, dynamic> data = doc.data();
+            String fromDateStr = data['fromDate'];
+            DateTime fromDate = DateTime.parse(fromDateStr);
         String budgetMonth = "${fromDate.year}-${fromDate.month.toString().padLeft(2, '0')}";
-        if (budgetMonth == currentMonth) {
-          _currentMonthName = _formatMonth(fromDate.month);
-          return Budget.fromJson(data);
-        }
-        return null;
+            if (budgetMonth == currentMonth) {
+              _currentMonthName = _formatMonth(fromDate.month);
+              return Budget.fromJson(data);
+            }
+            return null;
       }).where((budget) => budget != null).toList();
 
       if (budgets.isEmpty) {
@@ -62,5 +62,17 @@ class BudgetProvider with ChangeNotifier {
       "July", "August", "September", "October", "November", "December"
     ];
     return months[month - 1];
+  }
+
+  String getBudgetType(Budget budget) {
+    DateTime fromDate = DateTime.parse(budget.fromDate as String);
+    DateTime toDate = DateTime.parse(budget.toDate as String);
+    int differenceInDays = toDate.difference(fromDate).inDays;
+
+    if (differenceInDays <= 7) {
+      return "weekly";
+    } else {
+      return "monthly";
+    }
   }
 }
