@@ -76,7 +76,7 @@ class _AddBudgetScreenState extends State<AddBudgetScreen> {
               decoration: InputDecoration(
                 filled: true,
                 fillColor: Colors.white,
-                hintText: 'Budget name',
+                hintText: 'Income name',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide.none,

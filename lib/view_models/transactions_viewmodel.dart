@@ -24,6 +24,11 @@ class TransactionPageViewModel {
 
       for (var transactionDoc in transactionSnapshot.docs) {
         var transactionData = transactionDoc.data() as Map<String, dynamic>;
+
+        // Ensure the amount is treated as a double
+        transactionData['amount'] =
+            (transactionData['amount'] as num).toDouble();
+
         var categorySnapshot = await _firestore
             .collection('category')
             .doc(transactionData['categoryId'])
@@ -44,28 +49,28 @@ class TransactionPageViewModel {
 
   Future<List<Map<String, dynamic>>> searchTransactions(String query) async {
     List<Map<String, dynamic>> allTransactions =
-    await getAllTransactionsWithCategory().first;
+        await getAllTransactionsWithCategory().first;
 
     List<Map<String, dynamic>> filteredTransactions =
-    allTransactions.where((transaction) {
+        allTransactions.where((transaction) {
       var transactionData = transaction['transaction'] as Transactions;
 
-      bool matchesCategory =
-          transaction['categoryName']?.toLowerCase().contains(query.toLowerCase()) ?? false;
+      bool matchesCategory = transaction['categoryName']
+              ?.toLowerCase()
+              .contains(query.toLowerCase()) ??
+          false;
 
       bool matchesAmount = false;
       try {
         double queryAmount = double.parse(query);
         matchesAmount = transactionData.amount == queryAmount;
-      } catch (e) {
-      }
+      } catch (e) {}
 
       bool matchesDate = false;
       try {
         DateTime queryDate = DateTime.parse(query);
         matchesDate = transactionData.date == queryDate;
-      } catch (e) {
-      }
+      } catch (e) {}
 
       return matchesCategory || matchesAmount || matchesDate;
     }).toList();
@@ -77,9 +82,11 @@ class TransactionPageViewModel {
     var user = _auth.currentUser;
     if (user == null) return;
 
-    DocumentSnapshot transactionDoc = await _firestore.collection('transaction').doc(transactionId).get();
+    DocumentSnapshot transactionDoc =
+        await _firestore.collection('transaction').doc(transactionId).get();
     if (!transactionDoc.exists) return;
-    double transactionAmount = (transactionDoc.data() as Map<String, dynamic>)['amount'];
+    double transactionAmount =
+        (transactionDoc.data() as Map<String, dynamic>)['amount'];
 
     await _firestore.collection('transaction').doc(transactionId).delete();
 
@@ -93,10 +100,12 @@ class TransactionPageViewModel {
     if (budgetQuery.docs.isEmpty) return;
     DocumentSnapshot budgetDoc = budgetQuery.docs.first;
 
-    double totalRemaining = (budgetDoc.data() as Map<String, dynamic>)['totalRemaining'] ?? 0;
+    double totalRemaining =
+        (budgetDoc.data() as Map<String, dynamic>)['totalRemaining'] ?? 0;
     double updatedTotalRemaining = totalRemaining + transactionAmount;
 
-    await _firestore.collection('users')
+    await _firestore
+        .collection('users')
         .doc(user.uid)
         .collection('budget')
         .doc(budgetDoc.id)

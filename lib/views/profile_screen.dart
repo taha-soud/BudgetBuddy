@@ -1,13 +1,13 @@
-import 'package:budget_buddy/views/privacy_policy_screen.dart';
 import 'package:flutter/material.dart';
 import '../res/custom_color.dart';
 import '../view_models/profile_view_model.dart';
 import 'about_app_screen.dart';
 import 'bottom_bar.dart';
 import 'my_account_settings.dart';
+import 'privacy_policy_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key});
+  const ProfileScreen({Key? key}) : super(key: key);
 
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
@@ -15,6 +15,19 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final ProfileViewModel _viewModel = ProfileViewModel();
+  late Future<String?> _userNameFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserName();
+  }
+
+  void _fetchUserName() {
+    setState(() {
+      _userNameFuture = _viewModel.getUserName();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,13 +40,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Center(
             child: Column(
               children: [
-                FutureBuilder(
-                  future: _viewModel.getUserName(),
-                  builder: (context, AsyncSnapshot<String?> snapshot) {
+                FutureBuilder<String?>(
+                  future: _userNameFuture,
+                  builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const CircularProgressIndicator();
                     } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
+                      return Text(
+                        'Error: ${snapshot.error}',
+                        style: const TextStyle(color: Colors.red),
+                      );
                     } else {
                       final userName = snapshot.data ?? 'User Name';
                       return Column(
@@ -63,7 +79,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 25),
                 SizedBox(
-                  height: 200,
+                  height: 170,
                   child: Card(
                     color: Colors.white,
                     elevation: 4,
@@ -72,29 +88,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     child: Column(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12.0),
-                          child: ListTile(
-                            leading: const Icon(Icons.person),
-                            title: const Text('My Account'),
-                            subtitle: const Text('Make changes to your account'),
-                            trailing: const Icon(Icons.arrow_forward_ios),
-                            onTap: () {
-                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  const MyAccountSettingsScreen()));
-                            },
-                          ),
+                        ListTile(
+                          leading: const Icon(Icons.person),
+                          title: const Text('My Account'),
+                          subtitle: const Text('Make changes to your account'),
+                          trailing: const Icon(Icons.arrow_forward_ios),
+                          onTap: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const MyAccountSettingsScreen(),
+                              ),
+                            ).then((_) {
+                              _fetchUserName(); // Re-fetch user name when returning from MyAccountSettingsScreen
+                            });
+                          },
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12.0),
-                          child: ListTile(
-                            leading: const Icon(Icons.logout),
-                            title: const Text('Log Out'),
-                            subtitle: const Text('Log out from here'),
-                            trailing: const Icon(Icons.arrow_forward_ios),
-                            onTap: () {
-                              _viewModel.logout(context);
-                            },
-                          ),
+                        ListTile(
+                          leading: const Icon(Icons.logout),
+                          title: const Text('Log Out'),
+                          subtitle: const Text('Log out from here'),
+                          trailing: const Icon(Icons.arrow_forward_ios),
+                          onTap: () {
+                            _viewModel.logout(context);
+                          },
                         ),
                       ],
                     ),
@@ -115,7 +132,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 SizedBox(
-                  height: 200,
+                  height: 180,
                   child: Card(
                     color: AppColors.secondary,
                     elevation: 4,
@@ -124,33 +141,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     child: Column(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12.0),
-                          child: ListTile(
-                            leading: const Icon(Icons.notifications),
-                            title: const Text('Privacy Policy'),
-                            subtitle: const Text('View privacy policy'),
-                            trailing: const Icon(Icons.arrow_forward_ios),
-                            onTap: () {
-                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  const PrivacyPolicyScreen()));
-                            },
-                          ),
+                        ListTile(
+                          leading: const Icon(Icons.notifications),
+                          title: const Text('Privacy Policy'),
+                          subtitle: const Text('View privacy policy'),
+                          trailing: const Icon(Icons.arrow_forward_ios),
+                          onTap: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const PrivacyPolicyScreen(),
+                              ),
+                            );
+                          },
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12.0),
-                          child: ListTile(
-                            leading: const Icon(Icons.favorite),
-                            title: const Text('About App'),
-                            subtitle: const Text('Learn more about the app'),
-                            trailing: const Icon(Icons.arrow_forward_ios),
-                            onTap: () {
-                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  const AboutAppScreen()));                            },
-                          ),
+                        ListTile(
+                          leading: const Icon(Icons.favorite),
+                          title: const Text('About App'),
+                          subtitle: const Text('Learn more about the app'),
+                          trailing: const Icon(Icons.arrow_forward_ios),
+                          onTap: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const AboutAppScreen(),
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
                   ),
-                ),              ],
+                ),
+              ],
             ),
           ),
         ),

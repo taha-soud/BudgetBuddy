@@ -31,20 +31,41 @@ class EditBudgetViewModel extends ChangeNotifier {
     }
   }
 
-  // Updates the existing budget
+  // Updates the existing budget, excluding totalRemaining
   Future<void> updateBudget(String userId, Budget updatedBudget) async {
     if (currentBudget == null) {
       print("No current budget to update");
       return;
     }
+
     try {
+      // Calculate the difference between the updated total budget and the current total budget
+      double budgetDifference = updatedBudget.totalBudget - currentBudget!.totalBudget;
+
+      // Prepare the update data by removing totalRemaining from the updated budget
+      Map<String, dynamic> updateData = updatedBudget.toJson();
+      // Ensure totalRemaining is not updated
+      updateData['totalRemaining'] = currentBudget!.totalRemaining + budgetDifference;
+
+      // Perform the update on Firestore, including updating totalRemaining
       await firestore
           .collection('users')
           .doc(userId)
           .collection('budget')
           .doc(currentBudget!.id)  // Use the id from the fetched currentBudget
-          .update(updatedBudget.toJson());
-      currentBudget = updatedBudget;
+          .update(updateData);
+
+      // Update the local currentBudget model
+      currentBudget = Budget(
+        id: currentBudget!.id,
+        budgetName: updatedBudget.budgetName,
+        note: updatedBudget.note,
+        fromDate: updatedBudget.fromDate,
+        toDate: updatedBudget.toDate,
+        totalRemaining: currentBudget!.totalRemaining + budgetDifference,  // Update totalRemaining
+        totalBudget: updatedBudget.totalBudget,
+      );
+
       notifyListeners();
     } catch (e) {
       print("Error updating budget: $e");
